@@ -8,15 +8,15 @@ Later tasks are a proposed order and may change.
 1. **Project skeleton**: `backend/`, `frontend/`, `.gitignore` (PR #1)
 2. **Backend environment**: virtual env + `requirements.txt` (PR #1)
 3. **FastAPI health check**: `GET /health` + first pytest test (PR #2)
+4. **Database foundation**: SQLModel `Transaction` model, SQLite setup, model tests (PR #3)
 
 ## In progress
 
-4. **Database foundation**: SQLModel `Transaction` model, SQLite setup, model tests
-   (branch `feature/transaction-model`)
+5. **Transaction API**: `POST /transactions` and `GET /transactions`
+   (dollars ↔ cents at the API edge; branch `feature/transaction-api`)
 
 ## Planned
 
-5. Transaction API: create and list transactions (dollars ↔ cents at the API edge)
 6. Summary endpoint: total income, total expenses, balance
 7. Frontend setup: Vite + React (plain JavaScript)
 8. Transaction form and list in the UI
