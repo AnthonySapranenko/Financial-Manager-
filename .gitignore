@@ -1,5 +1,23 @@
-node_modules/
+# Secrets / environment
 .env
 .env.local
+
+# Node / frontend
+node_modules/
 dist/
 build/
+
+# Python / backend
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Local database (created at runtime, may contain your data)
+*.db
+*.sqlite3
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
