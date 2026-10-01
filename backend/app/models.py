@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 from enum import Enum
 
 from sqlalchemy import CheckConstraint
@@ -33,3 +34,54 @@ class Transaction(SQLModel, table=True):
     category: Category
     description: str = Field(default="", max_length=200)
     transaction_date: date
+
+
+def dollars_to_cents(amount: Decimal) -> int:
+    """Convert an exact dollar amount like Decimal("12.34") to 1234 cents."""
+    return int(amount * 100)
+
+
+def cents_to_dollars(cents: int) -> Decimal:
+    """Convert 1234 cents back to Decimal("12.34"), always with 2 decimal places."""
+    return (Decimal(cents) / 100).quantize(Decimal("0.01"))
+
+
+class TransactionCreate(SQLModel):
+    """What a client sends to create a transaction. No id: the database picks it."""
+
+    amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
+    type: TransactionType
+    category: Category
+    description: str = Field(default="", max_length=200)
+    transaction_date: date
+
+    def to_transaction(self) -> Transaction:
+        return Transaction(
+            amount_cents=dollars_to_cents(self.amount),
+            type=self.type,
+            category=self.category,
+            description=self.description,
+            transaction_date=self.transaction_date,
+        )
+
+
+class TransactionRead(SQLModel):
+    """What the API sends back: the saved transaction, with amount in dollars."""
+
+    id: int
+    amount: Decimal
+    type: TransactionType
+    category: Category
+    description: str
+    transaction_date: date
+
+    @classmethod
+    def from_transaction(cls, transaction: Transaction) -> "TransactionRead":
+        return cls(
+            id=transaction.id,
+            amount=cents_to_dollars(transaction.amount_cents),
+            type=transaction.type,
+            category=transaction.category,
+            description=transaction.description,
+            transaction_date=transaction.transaction_date,
+        )
