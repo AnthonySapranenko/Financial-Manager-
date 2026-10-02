@@ -12,14 +12,15 @@ Later tasks are a proposed order and may change.
 
 5. **Transaction API**: `POST /transactions` and `GET /transactions`, dollars ↔ cents at the API edge (PR #4)
 
+6. **Summary endpoint**: `GET /summary` with total income, total expenses, balance (PR #5)
+
 ## In progress
 
-6. **Summary endpoint**: `GET /summary` with total income, total expenses, balance
-   (branch `feature/summary-endpoint`)
+7. **Frontend setup**: Vite + React (plain JavaScript), Vitest + React Testing Library
+   (branch `feature/frontend-setup`)
 
 ## Planned
 
-7. Frontend setup: Vite + React (plain JavaScript)
 8. Transaction form and list in the UI
 9. Connect frontend to backend
 10. Dashboard: totals and balance
