@@ -85,3 +85,11 @@ class TransactionRead(SQLModel):
             description=transaction.description,
             transaction_date=transaction.transaction_date,
         )
+
+
+class Summary(SQLModel):
+    """Totals across all transactions, in dollars."""
+
+    total_income: Decimal
+    total_expenses: Decimal
+    balance: Decimal
