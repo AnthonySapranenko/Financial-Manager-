@@ -120,7 +120,7 @@ When the Boss makes an important architectural or technical decision, it should 
 ## Project Status
 
 The backend API works: transactions can be saved, listed, and summarized.
-The React frontend has not been started yet.
+The React frontend is set up but does not talk to the backend yet.
 
 See [TASKS.md](TASKS.md) for what is done and what comes next.
 
@@ -150,6 +150,25 @@ pytest
 ```
 
 Tests use a temporary in-memory database and never touch `finance.db`.
+
+## Running the Frontend
+
+Requires Node.js 22 or newer (developed on Node 24). From the `frontend/` folder:
+
+```text
+npm install
+npm run dev
+```
+
+The app runs at http://localhost:5173.
+
+Other commands, also run from `frontend/`:
+
+| Command | What it does |
+|---|---|
+| `npm test` | Run the frontend tests (Vitest), re-running on file changes |
+| `npm run lint` | Check the code for common mistakes (oxlint) |
+| `npm run build` | Build the production version into `dist/` |
 
 ## API Endpoints
 
