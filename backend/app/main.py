@@ -1,10 +1,17 @@
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI
-from sqlmodel import Session, select
+from sqlmodel import Session, func, select
 
 from app.database import create_db_and_tables, get_session
-from app.models import Transaction, TransactionCreate, TransactionRead
+from app.models import (
+    Summary,
+    Transaction,
+    TransactionCreate,
+    TransactionRead,
+    TransactionType,
+    cents_to_dollars,
+)
 
 
 @asynccontextmanager
@@ -42,3 +49,22 @@ def list_transactions(session: Session = Depends(get_session)):
     )
     transactions = session.exec(statement).all()
     return [TransactionRead.from_transaction(t) for t in transactions]
+
+
+@app.get("/summary", response_model=Summary)
+def get_summary(session: Session = Depends(get_session)):
+    """Total income, total expenses, and balance across all transactions."""
+    # Let the database add up the cents for each type: one row per type.
+    statement = select(Transaction.type, func.sum(Transaction.amount_cents)).group_by(
+        Transaction.type
+    )
+    totals = dict(session.exec(statement).all())
+
+    income_cents = totals.get(TransactionType.INCOME, 0)
+    expense_cents = totals.get(TransactionType.EXPENSE, 0)
+
+    return Summary(
+        total_income=cents_to_dollars(income_cents),
+        total_expenses=cents_to_dollars(expense_cents),
+        balance=cents_to_dollars(income_cents - expense_cents),
+    )
