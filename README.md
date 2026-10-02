@@ -119,15 +119,65 @@ When the Boss makes an important architectural or technical decision, it should 
 
 ## Project Status
 
-Early development.
+The backend API works: transactions can be saved, listed, and summarized.
+The React frontend has not been started yet.
 
-Current focus:
+See [TASKS.md](TASKS.md) for what is done and what comes next.
 
-1. Establish the Boss workflow
-2. Set up the project architecture
-3. Build a minimal working finance manager
-4. Learn the code and development process
-5. Expand the application gradually
+## Running the Backend
+
+Requires Python 3.14. From the `backend/` folder:
+
+```text
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+The API runs at http://127.0.0.1:8000. Interactive API docs are at
+http://127.0.0.1:8000/docs.
+
+Data is saved in `backend/finance.db`, which is created automatically on
+startup and is not committed to Git. Delete it to start with an empty database.
+
+## Running Tests
+
+From the `backend/` folder, with the virtual environment activated:
+
+```text
+pytest
+```
+
+Tests use a temporary in-memory database and never touch `finance.db`.
+
+## API Endpoints
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/health` | Check that the API is running |
+| POST | `/transactions` | Add an income or expense |
+| GET | `/transactions` | List all transactions, newest first |
+| GET | `/summary` | Total income, total expenses, and balance |
+
+Amounts are sent and returned in dollars (for example `12.34`) and stored
+in the database as whole cents (`1234`) to avoid rounding errors.
+
+Example request body for `POST /transactions`:
+
+```json
+{
+  "amount": 12.34,
+  "type": "expense",
+  "category": "food",
+  "description": "Groceries",
+  "transaction_date": "2026-10-01"
+}
+```
+
+`type` is `income` or `expense`. `category` is one of: `salary`, `food`,
+`housing`, `transportation`, `utilities`, `entertainment`, `health`,
+`shopping`, `other`.
 
 ## Disclaimer
 
