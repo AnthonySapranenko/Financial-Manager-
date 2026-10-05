@@ -34,6 +34,11 @@ export function getSummary() {
   return request('/summary')
 }
 
+// month is "YYYY-MM"
+export function getCategorySpending(month) {
+  return request(`/summary/categories?month=${month}`)
+}
+
 export function createTransaction(transaction) {
   return request('/transactions', {
     method: 'POST',

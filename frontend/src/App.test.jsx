@@ -36,6 +36,25 @@ const SUMMARY = {
 }
 let summary
 
+// What our fake GET /summary/categories answers for this month.
+function thisMonth() {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+}
+const SPENDING = {
+  month: thisMonth(),
+  total: '64.18',
+  categories: [{ category: 'food', amount: '64.18' }],
+}
+let spending
+
+// The fake backend: answers each URL like the real API would.
+function fakeBackend(url) {
+  if (url === '/api/summary') return respond(summary)
+  if (url.startsWith('/api/summary/categories')) return respond(spending)
+  return respond(SAVED)
+}
+
 // Builds a real Response object, like the one fetch gives back.
 function respond(body, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -48,11 +67,10 @@ function respond(body, status = 200) {
 // (vi.fn) that answers by URL and records how it was called.
 beforeEach(() => {
   summary = SUMMARY
+  spending = SPENDING
   vi.stubGlobal(
     'fetch',
-    vi.fn(async (url) =>
-      url === '/api/summary' ? respond(summary) : respond(SAVED),
-    ),
+    vi.fn(async (url) => fakeBackend(url)),
   )
 })
 
@@ -63,6 +81,10 @@ function postCall() {
 
 function totals() {
   return screen.getByRole('region', { name: 'Totals' })
+}
+
+function spendingPanel() {
+  return screen.getByRole('region', { name: /^Spending/ })
 }
 
 afterEach(() => {
@@ -89,9 +111,10 @@ function addTransaction({ amount, type, category, description = '', date }) {
   fireEvent.click(screen.getByRole('button', { name: 'Add transaction' }))
 }
 
-// Waits until the list has loaded, then returns its rows.
+// Waits until the transaction list has loaded, then returns its rows.
 async function listItems() {
-  const list = await screen.findByRole('list')
+  const section = screen.getByRole('region', { name: 'Transactions' })
+  const list = await within(section).findByRole('list')
   return within(list).getAllByRole('listitem')
 }
 
@@ -274,7 +297,7 @@ test('refreshes the totals after adding a transaction', async () => {
 
 test('a failed summary shows an error but the list still loads', async () => {
   fetch.mockImplementation(async (url) =>
-    url === '/api/summary' ? respond({}, 500) : respond(SAVED),
+    url === '/api/summary' ? respond({}, 500) : fakeBackend(url),
   )
   render(<App />)
 
@@ -282,4 +305,86 @@ test('a failed summary shows an error but the list still loads', async () => {
     'The server had a problem (error 500)',
   )
   expect(await listItems()).toHaveLength(2)
+})
+
+test("shows this month's spending per category", async () => {
+  render(<App />)
+
+  const monthName = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  })
+  expect(
+    screen.getByRole('heading', { name: `Spending · ${monthName}` }),
+  ).toBeInTheDocument()
+  const legend = await within(spendingPanel()).findByRole('list')
+  expect(legend).toHaveTextContent('Food$64.18100%')
+  expect(fetch).toHaveBeenCalledWith(
+    `/api/summary/categories?month=${thisMonth()}`,
+    undefined,
+  )
+})
+
+test('folds categories past the 5 largest into one slice', async () => {
+  spending = {
+    month: thisMonth(),
+    total: '100.00',
+    categories: [
+      { category: 'housing', amount: '40.00' },
+      { category: 'food', amount: '20.00' },
+      { category: 'transportation', amount: '15.00' },
+      { category: 'utilities', amount: '10.00' },
+      { category: 'health', amount: '5.00' },
+      { category: 'shopping', amount: '5.00' },
+      { category: 'other', amount: '5.00' },
+    ],
+  }
+  render(<App />)
+
+  const legend = await within(spendingPanel()).findByRole('list')
+  const rows = within(legend).getAllByRole('listitem')
+  expect(rows).toHaveLength(6)
+  expect(rows[0]).toHaveTextContent('Housing$40.0040%')
+  expect(rows[5]).toHaveTextContent('2 more categories$10.0010%')
+})
+
+test('says so when there is no spending this month', async () => {
+  spending = { month: thisMonth(), total: '0.00', categories: [] }
+  render(<App />)
+
+  expect(
+    await within(spendingPanel()).findByText(/No spending yet in/),
+  ).toBeInTheDocument()
+})
+
+test('refreshes spending after adding a transaction', async () => {
+  render(<App />)
+  await within(spendingPanel()).findByRole('list')
+  fetch.mockResolvedValueOnce(
+    respond(
+      {
+        id: 3,
+        amount: '10.00',
+        type: 'expense',
+        category: 'health',
+        description: '',
+        transaction_date: '2026-10-05',
+      },
+      201,
+    ),
+  )
+  spending = {
+    month: thisMonth(),
+    total: '74.18',
+    categories: [
+      { category: 'food', amount: '64.18' },
+      { category: 'health', amount: '10.00' },
+    ],
+  }
+
+  addTransaction({ amount: '10', type: 'Expense', category: 'health' })
+
+  expect(
+    await within(spendingPanel()).findByText('Health'),
+  ).toBeInTheDocument()
 })

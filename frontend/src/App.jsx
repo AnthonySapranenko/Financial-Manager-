@@ -1,8 +1,20 @@
 import { useEffect, useState } from 'react'
-import { createTransaction, getSummary, getTransactions } from './api.js'
+import {
+  createTransaction,
+  getCategorySpending,
+  getSummary,
+  getTransactions,
+} from './api.js'
+import CategorySpending from './CategorySpending.jsx'
 import Summary from './Summary.jsx'
 import TransactionForm from './TransactionForm.jsx'
 import TransactionList from './TransactionList.jsx'
+
+// This month as "YYYY-MM", in the user's own time zone.
+function currentMonth() {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+}
 
 function App() {
   // App owns the list, because both the form (adds) and the list (shows)
@@ -15,8 +27,13 @@ function App() {
   const [summary, setSummary] = useState(null)
   const [summaryError, setSummaryError] = useState('')
 
-  // Load the list and the totals once, after the first render. The two
-  // requests run at the same time, and each has its own error, so one failing
+  // This month's spending per category, from GET /summary/categories.
+  const month = currentMonth()
+  const [spending, setSpending] = useState(null)
+  const [spendingError, setSpendingError] = useState('')
+
+  // Load everything once, after the first render. The three requests run at
+  // the same time, and each has its own error, so one failing
   // doesn't hide the other. (In development, React runs effects twice on
   // purpose to catch bugs; `ignore` makes the first, cancelled run harmless.)
   useEffect(() => {
@@ -41,6 +58,14 @@ function App() {
         if (!ignore) setSummaryError(error.message)
       })
 
+    getCategorySpending(currentMonth())
+      .then((data) => {
+        if (!ignore) setSpending(data)
+      })
+      .catch((error) => {
+        if (!ignore) setSpendingError(error.message)
+      })
+
     return () => {
       ignore = true
     }
@@ -57,15 +82,25 @@ function App() {
     }
   }
 
+  async function refreshSpending() {
+    try {
+      setSpending(await getCategorySpending(currentMonth()))
+      setSpendingError('')
+    } catch (error) {
+      setSpendingError(error.message)
+    }
+  }
+
   // Save first, then show what the backend saved (it has the real id).
   // If saving fails, the error goes back to the form, which shows it.
   async function addTransaction(transaction) {
     const saved = await createTransaction(transaction)
     // Make a new array instead of changing the old one, so React notices.
     setTransactions((current) => [saved, ...current])
-    // Not awaited: the form can clear right away. refreshSummary handles its
-    // own errors, because the transaction is already saved at this point.
+    // Not awaited: the form can clear right away. The refresh functions
+    // handle their own errors, because the transaction is already saved.
     refreshSummary()
+    refreshSpending()
   }
 
   return (
@@ -77,11 +112,18 @@ function App() {
       <Summary summary={summary} error={summaryError} />
       <div className="layout">
         <TransactionForm onAdd={addTransaction} />
-        <TransactionList
-          transactions={transactions}
-          loading={loading}
-          error={loadError}
-        />
+        <div className="column">
+          <CategorySpending
+            month={month}
+            data={spending}
+            error={spendingError}
+          />
+          <TransactionList
+            transactions={transactions}
+            loading={loading}
+            error={loadError}
+          />
+        </div>
       </div>
     </main>
   )

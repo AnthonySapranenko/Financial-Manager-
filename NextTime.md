@@ -7,53 +7,65 @@ Last updated: 2026-10-05
 
 ## Where we are
 
-- Tasks 1–9 are merged (PRs #1–#9). Task 10 (dashboard totals) is on branch
-  `feature/dashboard`, pushed; the developer opens and merges the PR.
-  **Check that it is merged before starting Task 11.**
+- Tasks 1–10 are merged (PRs #1–#10). Task 11 (spending by category) is on
+  branch `feature/category-spending`, pushed; the developer opens and merges
+  the PR. **Check that it is merged before starting Task 12** (last time the
+  developer said "merged" before the merge had happened: verify with
+  `git merge-base --is-ancestor <branch> origin/master` after fetching).
+- Backend endpoints: `/health`, `POST`/`GET /transactions`, `GET /summary`
+  (all-time totals), `GET /summary/categories?month=YYYY-MM` (one month's
+  expenses per category, largest first, plus `total`; month validated by a
+  `Query(pattern=...)`; date range is `>= 1st` and `< next month's 1st`).
 - Frontend structure (`frontend/src/`):
-  - `api.js`: every `fetch` (`getTransactions`, `createTransaction`,
-    `getSummary`); `/api/...` is proxied by Vite to `http://127.0.0.1:8000`.
-  - `money.js`: `formatMoney()`, shared display formatting. The browser
-    never does money math; totals come from the backend.
-  - `App.jsx`: owns state; loads the list and the summary independently
-    (each has its own error), refreshes the summary after each add.
-  - `Summary.jsx` (all-time totals strip: income green `+`, expenses red
-    `−`, balance dark or red `−` when negative), `TransactionForm.jsx`,
+  - `api.js`: every `fetch`; `/api/...` is proxied by Vite to
+    `http://127.0.0.1:8000`.
+  - `money.js`: `formatMoney()`. The browser never does real money math;
+    totals come from the backend (the donut's "N more categories" slice is
+    grouped in whole cents for display only).
+  - `App.jsx`: owns state; loads list, summary, and this month's spending
+    independently (each has its own error); refreshes summary and spending
+    after each add.
+  - `Summary.jsx` (all-time totals strip), `CategorySpending.jsx` (hand-written
+    SVG donut via `stroke-dasharray`, max 6 slices: top 5 + gray folded
+    slice, legend with amount and percent), `TransactionForm.jsx`,
     `TransactionList.jsx`.
-- Design so far: one page; totals strip under the title, then form and list
-  (stacked on phones, side by side from 768px). Plain styling; a full visual
-  identity (Impeccable visual-direction round, `DESIGN.md`) was deferred
-  until after the dashboard, so it's now up for discussion.
-- Tests: 37 backend (pytest) and 14 frontend (Vitest, `fetch` faked by URL
-  with `vi.stubGlobal`), all passing.
+- Chart colors: slots 1–5 of the dataviz skill's palette, validated with its
+  `validate_palette.js` (passes; contrast WARN relieved by the legend). The
+  developer allowed running that validator.
+- Design: plain styling. The visual-identity round is planned for **after
+  Task 12** (developer's choice).
+- Tests: 44 backend (pytest) and 18 frontend (Vitest), all passing.
 - Running the app needs both servers (see `README.md`). A manual run creates
   `backend/finance.db`; delete it to start empty.
 
-## Start here: Task 11, spending by category
+## Start here: Task 12, monthly budgets (one per category)
 
-1. Confirm Task 10 is merged, then sync `master` and create
-   `feature/category-spending`.
-2. Plan with the developer. This one needs **backend work**: there is no
-   endpoint for per-category totals yet. Questions to settle:
-   - The endpoint (e.g. `GET /summary/categories`): expenses only, summed in
-     cents with `GROUP BY category` in SQL, like `/summary` does; new pytest
-     tests.
-   - All time, or a month? Task 12 (monthly budgets) will need per-month
-     category spending, so a month filter may be worth designing now.
-   - How to show it: a simple list with amounts and share of total, or a
-     chart. Load the `dataviz` skill before any chart work; avoid a chart
-     library unless clearly needed.
-   - Whether to do the deferred visual-identity round before or after.
+1. Confirm Task 11 is merged, then sync `master` and create
+   `feature/monthly-budgets`.
+2. Plan with the developer. Agreed earlier: one monthly budget per category.
+   Questions to settle:
+   - Data model: a `Budget` table (category, amount in cents). Same budget
+     every month, or per month? (Simplest: one standing amount per category.)
+   - Endpoints, e.g. `GET /budgets`, `PUT /budgets/{category}`; tests.
+   - UI: set budgets, and compare with this month's spending from
+     `/summary/categories` (a meter per category; see the dataviz skill's
+     "meter" form; over-budget must be unmistakable and not color-only).
+   - The all-time totals strip vs. this-month donut mismatch (Task 11
+     review): consider showing this month's totals too.
 3. Present the plan (files, tests, decisions) and wait for approval.
+4. After Task 12: the visual-identity round (`/impeccable`, new-work flow,
+   `DESIGN.md`).
 
 Small follow-ups found in reviews (not done yet):
 - The amount `.5` is rejected (must type `0.5`); the backend would accept it.
-- "Today" is computed when the page loads, so it goes stale past midnight.
+- "Today" and "this month" are computed when the page loads, so they go
+  stale past midnight.
 - The "date defaults to today" test could flake if it runs exactly at midnight.
 - `api.js` assumes a 422 `detail` is a list (true for FastAPI validation
   errors; a plain-text `detail` would show a confusing message).
 - Two very fast adds could get summary responses out of order and briefly
   show stale totals (practically impossible on localhost).
+- Donut tooltips are mouse-only (the legend carries all values).
 
 ## How the developer wants to work
 
