@@ -34,9 +34,11 @@ function TransactionForm({ onAdd }) {
   const [category, setCategory] = useState('')
   const [description, setDescription] = useState('')
   const [date, setDate] = useState(today())
-  const [error, setError] = useState('')
+  const [error, setError] = useState('') // problem with the amount
+  const [saveError, setSaveError] = useState('') // the server refused or failed
+  const [saving, setSaving] = useState(false)
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault() // stop the browser from reloading the page
 
     const trimmed = amount.trim()
@@ -45,23 +47,31 @@ function TransactionForm({ onAdd }) {
       setError('Enter an amount greater than 0, with at most 2 decimals.')
       return
     }
-
-    onAdd({
-      id: Date.now(), // temporary unique id; the backend assigns real ids in Task 9
-      amount: trimmed,
-      type,
-      category,
-      description: description.trim(),
-      transaction_date: date,
-    })
-
-    // Clear the form for the next entry.
-    setAmount('')
-    setType('')
-    setCategory('')
-    setDescription('')
-    setDate(today())
     setError('')
+    setSaveError('')
+    setSaving(true)
+
+    try {
+      // await pauses here until the backend answers. No id: the database picks it.
+      await onAdd({
+        amount: trimmed,
+        type,
+        category,
+        description: description.trim(),
+        transaction_date: date,
+      })
+      // Saved: clear the form for the next entry.
+      setAmount('')
+      setType('')
+      setCategory('')
+      setDescription('')
+      setDate(today())
+    } catch (err) {
+      // Not saved: keep what the user typed so they can fix it and retry.
+      setSaveError(err.message)
+    } finally {
+      setSaving(false) // runs either way
+    }
   }
 
   return (
@@ -148,7 +158,15 @@ function TransactionForm({ onAdd }) {
         />
       </label>
 
-      <button type="submit">Add transaction</button>
+      {saveError && (
+        <p className="form-error" role="alert">
+          {saveError}
+        </p>
+      )}
+
+      <button type="submit" disabled={saving}>
+        {saving ? 'Saving…' : 'Add transaction'}
+      </button>
     </form>
   )
 }

@@ -120,7 +120,7 @@ When the Boss makes an important architectural or technical decision, it should 
 ## Project Status
 
 The backend API works: transactions can be saved, listed, and summarized.
-The React frontend is set up but does not talk to the backend yet.
+The React frontend can add transactions and list them, saved through the API.
 
 See [TASKS.md](TASKS.md) for what is done and what comes next.
 
@@ -160,7 +160,11 @@ npm install
 npm run dev
 ```
 
-The app runs at http://localhost:5173.
+The app runs at http://localhost:5173. Start the backend too (see above):
+the frontend calls `/api/...`, and the Vite dev server forwards those
+requests to the backend at http://127.0.0.1:8000 (set up in
+`frontend/vite.config.js`). Without the backend, the page shows an error
+instead of the transaction list.
 
 Other commands, also run from `frontend/`:
 

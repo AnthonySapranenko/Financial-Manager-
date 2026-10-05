@@ -7,37 +7,47 @@ Last updated: 2026-10-05
 
 ## Where we are
 
-- Tasks 1–7 are merged (PRs #1–#7). Task 8 (transaction form and list) is
-  on branch `feature/transaction-ui`, pushed, PR opened by the developer.
-  **Check that it is merged before starting Task 9.**
-- Task 8 kept the UI separate from the backend (developer's choice): `App`
-  holds `transactions` in `useState`, seeded from `src/sampleTransactions.js`.
-  Components: `TransactionForm.jsx` (calls `onAdd`) and `TransactionList.jsx`.
-- Design decisions agreed in the shape step: one page (form above the list on
-  phones, side by side on desktop), Expense/Income buttons with no default,
-  date defaults to today (local time zone), form fully clears after saving,
-  plain styling. A full visual identity (Impeccable visual-direction round,
-  `DESIGN.md`) is deferred until after the dashboard.
-- Tests: 37 backend (pytest) and 8 frontend (Vitest), all passing.
+- Tasks 1–8 are merged (PRs #1–#8). Task 9 (connect frontend to backend) is
+  on branch `feature/connect-backend`, pushed; the developer opens and merges
+  the PR. **Check that it is merged before starting Task 10.**
+- How the frontend talks to the backend: the browser calls `/api/...` on the
+  Vite dev server, which forwards to `http://127.0.0.1:8000` (proxy in
+  `frontend/vite.config.js`, chosen over CORS). All `fetch` calls live in
+  `frontend/src/api.js`, which turns 422 `detail` lists and unreachable-server
+  errors into readable messages.
+- `App` loads the list in `useEffect` (with an `ignore` flag) and adds the
+  transaction the API returns. `TransactionForm` awaits `onAdd`, shows
+  "Saving…", and keeps the input if saving fails. `TransactionList` shows
+  loading / error / empty / list.
+- Design decisions from the Task 8 shape step: one page (form above the list
+  on phones, side by side on desktop), Expense/Income buttons with no
+  default, date defaults to today (local time zone), plain styling. A full
+  visual identity (Impeccable visual-direction round, `DESIGN.md`) is
+  deferred until after the dashboard.
+- Tests: 37 backend (pytest) and 10 frontend (Vitest, `fetch` faked with
+  `vi.stubGlobal`), all passing.
+- Running the app needs both servers (see `README.md`). A manual run creates
+  `backend/finance.db`; delete it to start empty.
 
-## Start here: Task 9, connect the frontend to the backend
+## Start here: Task 10, dashboard with totals and balance
 
-1. Confirm Task 8 is merged, then sync `master` and create
-   `feature/connect-backend`.
-2. Plan with the developer:
-   - CORS in FastAPI (`CORSMiddleware` for `http://localhost:5173`) or a Vite
-     proxy. Pick one and explain why.
-   - Load with `GET /transactions` (`useEffect` + `fetch`), add with
-     `POST /transactions`, then delete `sampleTransactions.js`. Sample data
-     already has the API's shape, so `TransactionList` should not change.
-   - Loading and error states, and showing the API's 422 `detail` messages.
-   - How to test `fetch` in Vitest (mock it).
+1. Confirm Task 9 is merged, then sync `master` and create
+   `feature/dashboard`.
+2. Plan with the developer. `GET /summary` already returns `total_income`,
+   `total_expenses`, and `balance` as strings. Questions to settle:
+   - Where the totals sit on the page, and whether this needs an
+     `/impeccable shape` step (a dashboard is a new screen area).
+   - Keeping totals in sync after adding a transaction: refetch `/summary`,
+     or get it alongside the list. Never add money up in the browser.
+   - Showing a negative balance unmistakably.
 3. Present the plan (files, tests, decisions) and wait for approval.
 
-Small follow-ups found in the Task 8 review (not done yet):
+Small follow-ups found in reviews (not done yet):
 - The amount `.5` is rejected (must type `0.5`); the backend would accept it.
 - "Today" is computed when the page loads, so it goes stale past midnight.
 - The "date defaults to today" test could flake if it runs exactly at midnight.
+- `api.js` assumes a 422 `detail` is a list (true for FastAPI validation
+  errors; a plain-text `detail` would show a confusing message).
 
 ## How the developer wants to work
 
