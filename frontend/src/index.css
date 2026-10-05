@@ -187,11 +187,21 @@ button[type='submit']:hover {
   background: #0757b8;
 }
 
+button[type='submit']:disabled {
+  background: var(--text-muted);
+  cursor: wait;
+}
+
 /* ---- List ---- */
 
 .empty {
   margin: 0;
   color: var(--text-muted);
+}
+
+.load-error {
+  margin: 0;
+  color: var(--expense);
 }
 
 .transaction-list {
