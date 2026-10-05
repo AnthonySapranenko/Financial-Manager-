@@ -231,6 +231,18 @@ Keep responsibilities separated.
 
 Do not put database logic directly into frontend components.
 
+### Frontend Design (Impeccable)
+
+Use the Impeccable plugin for all frontend UI work: layout, forms, the
+dashboard, color, typography, accessibility, and empty, loading, and error
+states.
+
+* `PRODUCT.md` is the product brief that design decisions build on.
+* Start new screens with `/impeccable shape` to plan the UI before coding.
+* Impeccable guides design choices.
+* This file still wins on scope and code complexity: keep the frontend code
+  simple enough for the developer to understand and explain.
+
 ---
 
 # 11. Scope Control
