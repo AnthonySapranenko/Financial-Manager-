@@ -9,15 +9,10 @@ Later tasks are a proposed order and may change.
 2. **Backend environment**: virtual env + `requirements.txt` (PR #1)
 3. **FastAPI health check**: `GET /health` + first pytest test (PR #2)
 4. **Database foundation**: SQLModel `Transaction` model, SQLite setup, model tests (PR #3)
-
 5. **Transaction API**: `POST /transactions` and `GET /transactions`, dollars ↔ cents at the API edge (PR #4)
-
 6. **Summary endpoint**: `GET /summary` with total income, total expenses, balance (PR #5)
-
-## In progress
-
-7. **Frontend setup**: Vite + React (plain JavaScript), Vitest + React Testing Library
-   (branch `feature/frontend-setup`)
+7. **Frontend setup**: Vite + React (plain JavaScript), Vitest + React Testing Library (PR #6)
+   - Product brief for design work: `PRODUCT.md` (Impeccable `init`)
 
 ## Planned
 
