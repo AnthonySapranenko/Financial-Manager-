@@ -1,15 +1,250 @@
+/* Colors live in one place so they're easy to change later. */
 :root {
+  --text: #1f2328;
+  --text-muted: #59636e;
+  --background: #f6f8fa;
+  --surface: #ffffff;
+  --border: #d1d9e0;
+  --accent: #0969da;
+  --income: #1a7f37;
+  --income-soft: #dafbe1;
+  --expense: #cf222e;
+  --expense-soft: #ffebe9;
+
   font-family: system-ui, sans-serif;
-  color: #1f2328;
-  background: #f6f8fa;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--background);
+  accent-color: var(--accent);
 }
 
 body {
   margin: 0;
 }
 
+::selection {
+  background: #b6e3ff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 main {
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem 3rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+h2 {
+  margin: 0 0 1rem;
+  font-size: 1.125rem;
+}
+
+.note {
+  margin: 0.25rem 0 1.5rem;
+  color: var(--text-muted);
+}
+
+/* Phone: form above list. Wide screens: form on the left, list on the right. */
+.layout {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .layout {
+    grid-template-columns: 20rem 1fr;
+  }
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+/* ---- Form ---- */
+
+.transaction-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.transaction-form h2 {
+  margin: 0; /* the grid gap already spaces it */
+}
+
+.field {
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+input,
+select,
+button {
+  font: inherit;
+  font-size: 1rem; /* 16px+ stops iPhones from zooming in on focus */
+}
+
+.field input,
+.field select {
+  font-weight: 400;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--expense);
+}
+
+.form-error {
+  margin: -0.5rem 0 0;
+  color: var(--expense);
+  font-size: 0.875rem;
+}
+
+/* Expense / Income: real radio buttons, styled as two big buttons. */
+.type-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.type-toggle legend {
+  padding: 0;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.type-option {
+  position: relative; /* keeps the hidden radio inside its button */
+}
+
+.type-option input {
+  /* Hidden visually but still usable with keyboard and screen readers. */
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.type-option span {
+  display: block;
+  padding: 0.625rem;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.type-option input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.type-option.expense input:checked + span {
+  background: var(--expense-soft);
+  border-color: var(--expense);
+  color: var(--expense);
+}
+
+.type-option.income input:checked + span {
+  background: var(--income-soft);
+  border-color: var(--income);
+  color: var(--income);
+}
+
+button[type='submit'] {
+  padding: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--accent);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button[type='submit']:hover {
+  background: #0757b8;
+}
+
+/* ---- List ---- */
+
+.empty {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.transaction-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.transaction {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.transaction:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.category {
+  display: block;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.description {
+  display: block;
+  color: var(--text-muted);
+  overflow-wrap: anywhere; /* long words can't push the amount off screen */
+}
+
+.amount-date {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.amount {
+  display: block;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums; /* digits line up in a column */
+}
+
+.amount.income {
+  color: var(--income);
+}
+
+.amount.expense {
+  color: var(--expense);
+}
+
+time {
+  font-size: 0.875rem;
+  color: var(--text-muted);
 }

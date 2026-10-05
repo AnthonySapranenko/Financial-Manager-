@@ -12,11 +12,11 @@ Later tasks are a proposed order and may change.
 5. **Transaction API**: `POST /transactions` and `GET /transactions`, dollars ↔ cents at the API edge (PR #4)
 6. **Summary endpoint**: `GET /summary` with total income, total expenses, balance (PR #5)
 7. **Frontend setup**: Vite + React (plain JavaScript), Vitest + React Testing Library (PR #6)
-   - Product brief for design work: `PRODUCT.md` (Impeccable `init`)
+   - Product brief for design work: `PRODUCT.md` (Impeccable `init`) (PR #7)
+8. **Transaction form and list**: one-page UI with sample data in React state
 
 ## Planned
 
-8. Transaction form and list in the UI
 9. Connect frontend to backend
 10. Dashboard: totals and balance
 11. Spending by category

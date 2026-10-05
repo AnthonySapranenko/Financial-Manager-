@@ -7,28 +7,37 @@ Last updated: 2026-10-05
 
 ## Where we are
 
-- Tasks 1–7 are done and merged (PRs #1–#6). The backend API and the React
-  frontend skeleton both work.
-- `PRODUCT.md` (the product brief from `/impeccable init`) and the Impeccable
-  rule in `BOSS.md` §10 are on branch `docs/product-brief`.
-  **Check that this PR is merged before starting Task 8.**
-- Tests: 37 backend (pytest) and 1 frontend (Vitest), all passing.
+- Tasks 1–7 are merged (PRs #1–#7). Task 8 (transaction form and list) is
+  on branch `feature/transaction-ui`, pushed, PR opened by the developer.
+  **Check that it is merged before starting Task 9.**
+- Task 8 kept the UI separate from the backend (developer's choice): `App`
+  holds `transactions` in `useState`, seeded from `src/sampleTransactions.js`.
+  Components: `TransactionForm.jsx` (calls `onAdd`) and `TransactionList.jsx`.
+- Design decisions agreed in the shape step: one page (form above the list on
+  phones, side by side on desktop), Expense/Income buttons with no default,
+  date defaults to today (local time zone), form fully clears after saving,
+  plain styling. A full visual identity (Impeccable visual-direction round,
+  `DESIGN.md`) is deferred until after the dashboard.
+- Tests: 37 backend (pytest) and 8 frontend (Vitest), all passing.
 
-## Start here: Task 8, the transaction form and list
+## Start here: Task 9, connect the frontend to the backend
 
-1. Confirm `docs/product-brief` is merged, then sync `master` and create
-   `feature/transaction-ui`.
-2. Run `/impeccable shape transaction form and list` to plan the screen with
-   the developer before writing code. Follow `PRODUCT.md`: logging must take
-   seconds, it must work on phone and desktop, and income vs. expense must be
-   unmistakable.
-3. Present a plan (files, tests, decisions) and wait for approval.
-4. Build, test, review, explain, and commit, following the Boss Loop.
+1. Confirm Task 8 is merged, then sync `master` and create
+   `feature/connect-backend`.
+2. Plan with the developer:
+   - CORS in FastAPI (`CORSMiddleware` for `http://localhost:5173`) or a Vite
+     proxy. Pick one and explain why.
+   - Load with `GET /transactions` (`useEffect` + `fetch`), add with
+     `POST /transactions`, then delete `sampleTransactions.js`. Sample data
+     already has the API's shape, so `TransactionList` should not change.
+   - Loading and error states, and showing the API's 422 `detail` messages.
+   - How to test `fetch` in Vitest (mock it).
+3. Present the plan (files, tests, decisions) and wait for approval.
 
-Scope to settle in the plan: Task 8 builds the UI, and Task 9 connects it to
-the backend. Decide with the developer whether Task 8 uses sample data in
-state, or whether 8 and 9 merge. Connecting needs CORS in FastAPI (or a Vite
-proxy) so `localhost:5173` can call `localhost:8000`.
+Small follow-ups found in the Task 8 review (not done yet):
+- The amount `.5` is rejected (must type `0.5`); the backend would accept it.
+- "Today" is computed when the page loads, so it goes stale past midnight.
+- The "date defaults to today" test could flake if it runs exactly at midnight.
 
 ## How the developer wants to work
 
@@ -71,6 +80,9 @@ errors are 422 responses with FastAPI's `detail` list.
   `git branch -d`.
 - Impeccable's folder is allowed in `.claude/settings.local.json`. Its
   `context` command must be run once per session before design work.
+- Screenshots: headless Edge (`msedge --headless=new --screenshot`) can't go
+  narrower than 504px. For a 390px phone view, load the app in a 390px-wide
+  `<iframe>` and add `--virtual-time-budget=5000`.
 - Gotcha: when editing files with Python, pass `encoding="utf-8"` (the
   Windows default is cp1252), or use the Edit tool.
 
