@@ -14,11 +14,11 @@ Later tasks are a proposed order and may change.
 7. **Frontend setup**: Vite + React (plain JavaScript), Vitest + React Testing Library (PR #6)
    - Product brief for design work: `PRODUCT.md` (Impeccable `init`) (PR #7)
 8. **Transaction form and list**: one-page UI with sample data in React state (PR #8)
-9. **Connect frontend to backend**: Vite proxy `/api` -> FastAPI, `src/api.js`, loading/error states
+9. **Connect frontend to backend**: Vite proxy `/api` -> FastAPI, `src/api.js`, loading/error states (PR #9)
+10. **Dashboard**: all-time income, expenses, and balance strip from `GET /summary`, refreshed after each add
 
 ## Planned
 
-10. Dashboard: totals and balance
 11. Spending by category
 12. Monthly budgets (one per category)
 

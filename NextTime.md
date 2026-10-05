@@ -7,39 +7,43 @@ Last updated: 2026-10-05
 
 ## Where we are
 
-- Tasks 1–8 are merged (PRs #1–#8). Task 9 (connect frontend to backend) is
-  on branch `feature/connect-backend`, pushed; the developer opens and merges
-  the PR. **Check that it is merged before starting Task 10.**
-- How the frontend talks to the backend: the browser calls `/api/...` on the
-  Vite dev server, which forwards to `http://127.0.0.1:8000` (proxy in
-  `frontend/vite.config.js`, chosen over CORS). All `fetch` calls live in
-  `frontend/src/api.js`, which turns 422 `detail` lists and unreachable-server
-  errors into readable messages.
-- `App` loads the list in `useEffect` (with an `ignore` flag) and adds the
-  transaction the API returns. `TransactionForm` awaits `onAdd`, shows
-  "Saving…", and keeps the input if saving fails. `TransactionList` shows
-  loading / error / empty / list.
-- Design decisions from the Task 8 shape step: one page (form above the list
-  on phones, side by side on desktop), Expense/Income buttons with no
-  default, date defaults to today (local time zone), plain styling. A full
-  visual identity (Impeccable visual-direction round, `DESIGN.md`) is
-  deferred until after the dashboard.
-- Tests: 37 backend (pytest) and 10 frontend (Vitest, `fetch` faked with
-  `vi.stubGlobal`), all passing.
+- Tasks 1–9 are merged (PRs #1–#9). Task 10 (dashboard totals) is on branch
+  `feature/dashboard`, pushed; the developer opens and merges the PR.
+  **Check that it is merged before starting Task 11.**
+- Frontend structure (`frontend/src/`):
+  - `api.js`: every `fetch` (`getTransactions`, `createTransaction`,
+    `getSummary`); `/api/...` is proxied by Vite to `http://127.0.0.1:8000`.
+  - `money.js`: `formatMoney()`, shared display formatting. The browser
+    never does money math; totals come from the backend.
+  - `App.jsx`: owns state; loads the list and the summary independently
+    (each has its own error), refreshes the summary after each add.
+  - `Summary.jsx` (all-time totals strip: income green `+`, expenses red
+    `−`, balance dark or red `−` when negative), `TransactionForm.jsx`,
+    `TransactionList.jsx`.
+- Design so far: one page; totals strip under the title, then form and list
+  (stacked on phones, side by side from 768px). Plain styling; a full visual
+  identity (Impeccable visual-direction round, `DESIGN.md`) was deferred
+  until after the dashboard, so it's now up for discussion.
+- Tests: 37 backend (pytest) and 14 frontend (Vitest, `fetch` faked by URL
+  with `vi.stubGlobal`), all passing.
 - Running the app needs both servers (see `README.md`). A manual run creates
   `backend/finance.db`; delete it to start empty.
 
-## Start here: Task 10, dashboard with totals and balance
+## Start here: Task 11, spending by category
 
-1. Confirm Task 9 is merged, then sync `master` and create
-   `feature/dashboard`.
-2. Plan with the developer. `GET /summary` already returns `total_income`,
-   `total_expenses`, and `balance` as strings. Questions to settle:
-   - Where the totals sit on the page, and whether this needs an
-     `/impeccable shape` step (a dashboard is a new screen area).
-   - Keeping totals in sync after adding a transaction: refetch `/summary`,
-     or get it alongside the list. Never add money up in the browser.
-   - Showing a negative balance unmistakably.
+1. Confirm Task 10 is merged, then sync `master` and create
+   `feature/category-spending`.
+2. Plan with the developer. This one needs **backend work**: there is no
+   endpoint for per-category totals yet. Questions to settle:
+   - The endpoint (e.g. `GET /summary/categories`): expenses only, summed in
+     cents with `GROUP BY category` in SQL, like `/summary` does; new pytest
+     tests.
+   - All time, or a month? Task 12 (monthly budgets) will need per-month
+     category spending, so a month filter may be worth designing now.
+   - How to show it: a simple list with amounts and share of total, or a
+     chart. Load the `dataviz` skill before any chart work; avoid a chart
+     library unless clearly needed.
+   - Whether to do the deferred visual-identity round before or after.
 3. Present the plan (files, tests, decisions) and wait for approval.
 
 Small follow-ups found in reviews (not done yet):
@@ -48,6 +52,8 @@ Small follow-ups found in reviews (not done yet):
 - The "date defaults to today" test could flake if it runs exactly at midnight.
 - `api.js` assumes a 422 `detail` is a list (true for FastAPI validation
   errors; a plain-text `detail` would show a confusing message).
+- Two very fast adds could get summary responses out of order and briefly
+  show stale totals (practically impossible on localhost).
 
 ## How the developer wants to work
 
@@ -92,7 +98,9 @@ errors are 422 responses with FastAPI's `detail` list.
   `context` command must be run once per session before design work.
 - Screenshots: headless Edge (`msedge --headless=new --screenshot`) can't go
   narrower than 504px. For a 390px phone view, load the app in a 390px-wide
-  `<iframe>` and add `--virtual-time-budget=5000`.
+  `<iframe>` and add `--virtual-time-budget=5000` (use `vite preview`, not
+  the dev server). API data may not arrive inside the iframe in time; a
+  direct 504px capture shows the same phone layout with real data.
 - Gotcha: when editing files with Python, pass `encoding="utf-8"` (the
   Windows default is cp1252), or use the Edit tool.
 

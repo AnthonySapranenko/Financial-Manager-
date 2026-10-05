@@ -1,9 +1,4 @@
-// Formats "1200.00" as "$1,200.00". Number() is only used for display here;
-// we never add or subtract amounts in the browser.
-const dollars = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-})
+import { formatMoney } from './money.js'
 
 // Formats "2026-09-28" as "Sep 28, 2026". We build the Date from its parts
 // because new Date("2026-09-28") means midnight UTC, which is still Sep 27
@@ -50,7 +45,7 @@ function TransactionList({ transactions, loading, error }) {
             <div className="amount-date">
               <span className={`amount ${t.type}`}>
                 {t.type === 'income' ? '+' : '−'}
-                {dollars.format(Number(t.amount))}
+                {formatMoney(t.amount)}
               </span>
               <time dateTime={t.transaction_date}>
                 {formatDate(t.transaction_date)}
