@@ -93,3 +93,18 @@ class Summary(SQLModel):
     total_income: Decimal
     total_expenses: Decimal
     balance: Decimal
+
+
+class CategoryTotal(SQLModel):
+    """How much was spent in one category, in dollars."""
+
+    category: Category
+    amount: Decimal
+
+
+class CategorySpending(SQLModel):
+    """Expenses for one month, per category (largest first) and in total."""
+
+    month: str  # "YYYY-MM"
+    total: Decimal
+    categories: list[CategoryTotal]
