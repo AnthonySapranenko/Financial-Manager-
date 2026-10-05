@@ -30,6 +30,10 @@ export function getTransactions() {
   return request('/transactions')
 }
 
+export function getSummary() {
+  return request('/summary')
+}
+
 export function createTransaction(transaction) {
   return request('/transactions', {
     method: 'POST',

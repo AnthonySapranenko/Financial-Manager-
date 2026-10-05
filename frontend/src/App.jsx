@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { createTransaction, getTransactions } from './api.js'
+import { createTransaction, getSummary, getTransactions } from './api.js'
+import Summary from './Summary.jsx'
 import TransactionForm from './TransactionForm.jsx'
 import TransactionList from './TransactionList.jsx'
 
@@ -10,9 +11,14 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
 
-  // Load the list once, after the first render. (In development, React runs
-  // effects twice on purpose to catch bugs; `ignore` makes the first,
-  // cancelled run harmless.)
+  // The totals from GET /summary. null means "not loaded yet".
+  const [summary, setSummary] = useState(null)
+  const [summaryError, setSummaryError] = useState('')
+
+  // Load the list and the totals once, after the first render. The two
+  // requests run at the same time, and each has its own error, so one failing
+  // doesn't hide the other. (In development, React runs effects twice on
+  // purpose to catch bugs; `ignore` makes the first, cancelled run harmless.)
   useEffect(() => {
     let ignore = false
 
@@ -27,10 +33,29 @@ function App() {
         if (!ignore) setLoading(false)
       })
 
+    getSummary()
+      .then((data) => {
+        if (!ignore) setSummary(data)
+      })
+      .catch((error) => {
+        if (!ignore) setSummaryError(error.message)
+      })
+
     return () => {
       ignore = true
     }
   }, [])
+
+  // Ask the backend for fresh totals. We never add up money in the browser:
+  // the backend does it in whole cents, so there's one source of truth.
+  async function refreshSummary() {
+    try {
+      setSummary(await getSummary())
+      setSummaryError('')
+    } catch (error) {
+      setSummaryError(error.message)
+    }
+  }
 
   // Save first, then show what the backend saved (it has the real id).
   // If saving fails, the error goes back to the form, which shows it.
@@ -38,6 +63,9 @@ function App() {
     const saved = await createTransaction(transaction)
     // Make a new array instead of changing the old one, so React notices.
     setTransactions((current) => [saved, ...current])
+    // Not awaited: the form can clear right away. refreshSummary handles its
+    // own errors, because the transaction is already saved at this point.
+    refreshSummary()
   }
 
   return (
@@ -46,6 +74,7 @@ function App() {
         <h1>Finance Manager</h1>
         <p className="note">Practice app: use made-up data only.</p>
       </header>
+      <Summary summary={summary} error={summaryError} />
       <div className="layout">
         <TransactionForm onAdd={addTransaction} />
         <TransactionList
