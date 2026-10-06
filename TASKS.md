@@ -21,13 +21,15 @@ Later tasks are a proposed order and may change.
 
 13. **Visual identity**: banknote-engraving look (`DESIGN.md`), self-hosted Bodoni Moda for money figures, three-column desktop / phone-first layout, unboxed sections (PR #13)
 
+14. **Amount input polish**: `.5` accepted, budget amounts checked in the browser, midnight-proof date test (PR #14)
+
 ## In review
 
-14. **Amount input polish**: `.5` accepted, budget amounts checked in the browser, midnight-proof date test (branch `feature/amount-polish`)
+15. **Delete a transaction**: `DELETE /transactions/{id}`, a confirm-then-delete button on each row, totals reload after (branch `feature/delete-transaction`)
 
 ## Planned
 
-Nothing yet. Candidates: the remaining follow-ups in `NextTime.md`, or editing/deleting transactions (undecided in `PRODUCT.md`).
+Nothing yet. Candidates: the remaining follow-ups in `NextTime.md`, or editing a transaction in place (still undecided in `PRODUCT.md`).
 
 ## Agreed decisions
 

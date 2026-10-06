@@ -91,3 +91,31 @@ def test_create_transaction_rejects_missing_field(client):
     response = client.post("/transactions", json=incomplete)
 
     assert response.status_code == 422
+
+
+def test_delete_removes_only_that_transaction(client):
+    keep = post_transaction(client, description="keep").json()
+    remove = post_transaction(client, description="remove").json()
+
+    response = client.delete(f"/transactions/{remove['id']}")
+
+    assert response.status_code == 204
+    remaining = client.get("/transactions").json()
+    assert [t["id"] for t in remaining] == [keep["id"]]
+
+
+def test_deleted_transaction_no_longer_counts_in_the_summary(client):
+    expense = post_transaction(client, amount="40.00").json()
+
+    client.delete(f"/transactions/{expense['id']}")
+
+    assert client.get("/summary").json()["total_expenses"] == "0.00"
+
+
+def test_deleting_a_missing_transaction_is_fine(client):
+    # Already gone (another tab, a double click): nothing to do, no error.
+    assert client.delete("/transactions/999").status_code == 204
+
+
+def test_delete_rejects_a_non_number_id(client):
+    assert client.delete("/transactions/abc").status_code == 422

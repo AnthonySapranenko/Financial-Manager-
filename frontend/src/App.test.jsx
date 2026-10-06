@@ -67,6 +67,9 @@ function fakeBackend(url, options) {
       : respond({ category: 'food', amount: '450.00' })
   }
   if (url.startsWith('/api/budgets')) return respond(budgets)
+  if (url.startsWith('/api/transactions/') && options?.method === 'DELETE') {
+    return new Response(null, { status: 204 })
+  }
   return respond(SAVED)
 }
 
@@ -115,7 +118,13 @@ function spendingPanel() {
 afterEach(() => {
   vi.unstubAllGlobals()
   vi.useRealTimers() // undo any test that froze the clock
+  vi.restoreAllMocks() // undo any spy, like the one on window.confirm
 })
+
+// The Delete button for one transaction, found by its full accessible name.
+function deleteButton(name) {
+  return screen.getByRole('button', { name: `Delete ${name}` })
+}
 
 // Fills in the form the way a user would, then clicks the button.
 function addTransaction({ amount, type, category, description = '', date }) {
@@ -519,4 +528,51 @@ test("shows the backend's message when a budget is refused", async () => {
   expect(await within(budgetsPanel()).findByRole('alert')).toHaveTextContent(
     "Salary is income, so it can't have a budget.",
   )
+})
+
+test('deleting asks first, then removes the transaction and reloads totals', async () => {
+  vi.spyOn(window, 'confirm').mockReturnValue(true) // the user clicks OK
+  render(<App />)
+  await listItems()
+  const summaryLoads = () =>
+    fetch.mock.calls.filter(([url]) => url.startsWith('/api/summary?')).length
+  const loadsBefore = summaryLoads()
+
+  fireEvent.click(deleteButton('−$64.18 food expense on Sep 28, 2026'))
+
+  expect(window.confirm).toHaveBeenCalledWith(
+    'Delete −$64.18 food expense on Sep 28, 2026?',
+  )
+  await waitFor(async () => expect(await listItems()).toHaveLength(1))
+  expect(callWith('DELETE')[0]).toBe('/api/transactions/2')
+  expect(summaryLoads()).toBeGreaterThan(loadsBefore)
+})
+
+test('cancelling the question deletes nothing', async () => {
+  vi.spyOn(window, 'confirm').mockReturnValue(false) // the user clicks Cancel
+  render(<App />)
+  await listItems()
+
+  fireEvent.click(deleteButton('+$2,400.00 salary income on Sep 15, 2026'))
+
+  expect(callWith('DELETE')).toBeUndefined()
+  expect(await listItems()).toHaveLength(2)
+})
+
+test('a failed delete shows the error and keeps the transaction', async () => {
+  vi.spyOn(window, 'confirm').mockReturnValue(true)
+  render(<App />)
+  await listItems()
+  fetch.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+
+  fireEvent.click(deleteButton('−$64.18 food expense on Sep 28, 2026'))
+
+  const items = await listItems()
+  expect(await within(items[0]).findByRole('alert')).toHaveTextContent(
+    "Can't reach the server. Is the backend running?",
+  )
+  expect(items).toHaveLength(2)
+  expect(
+    deleteButton('−$64.18 food expense on Sep 28, 2026'),
+  ).toBeEnabled() // ready to try again
 })

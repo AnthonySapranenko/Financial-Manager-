@@ -3,15 +3,16 @@
 Handoff notes for the next Claude Code session. Read this first, then
 `README.md`, `BOSS.md`, `TASKS.md`, and `PRODUCT.md`.
 
-Last updated: 2026-10-06 (Task 14)
+Last updated: 2026-10-06 (Task 15)
 
 ## Where we are
 
-- Tasks 1–13 are merged (PRs #1–#13), including the visual identity
-  (`DESIGN.md`). Task 14 (amount input polish) is in review; see below.
+- Tasks 1–14 are merged (PRs #1–#14), including the visual identity
+  (`DESIGN.md`). Task 15 (delete a transaction) is in review; see below.
 - When a PR is reported merged, verify before building on it: after
   `git fetch`, run `git merge-base --is-ancestor <branch> origin/master`.
 - Backend endpoints: `/health`; `POST`/`GET /transactions`;
+  `DELETE /transactions/{id}` (204, also when already gone);
   `GET /summary` (optional `?month=YYYY-MM`, otherwise all time);
   `GET /summary/categories?month=`; `GET /budgets?month=` (every expense
   category with `budget` or null, `spent`, `remaining`, negative when over);
@@ -26,23 +27,24 @@ Last updated: 2026-10-06 (Task 14)
   reloads totals, spending, and budgets after each add), `Summary.jsx`
   (this month's totals strip), `CategorySpending.jsx` (SVG donut + legend),
   `Budgets.jsx` (one form per category row, meter bar, "Over by" in red
-  bold), `TransactionForm.jsx`, `TransactionList.jsx`.
-- Tests: 55 backend (pytest) and 31 frontend (Vitest), all passing.
+  bold), `TransactionForm.jsx`, `TransactionList.jsx` (one `TransactionRow` per
+  transaction, with a confirm-then-delete button and its own error).
+- Tests: 59 backend (pytest) and 34 frontend (Vitest), all passing.
 - Running the app needs both servers (see `README.md`). A manual run creates
   `backend/finance.db`; delete it to start empty.
 
-## Start here: Task 14 is in review
+## Start here: Task 15 is in review
 
-Task 14 (amount input polish) is committed and pushed on
-`feature/amount-polish`; the developer opens and merges the PR. Verify the
+Task 15 (delete a transaction) is committed and pushed on
+`feature/delete-transaction`; the developer opens and merges the PR. Verify the
 merge with `git merge-base --is-ancestor` before building on it.
 
-- Amounts like `.5` are accepted (frontend rule now matches the backend; a
-  backend test guards `".5"` -> `"0.50"`).
-- Budget boxes are checked in the browser with the same rule and message,
-  marked `aria-invalid` like the form. Empty still means "remove the budget".
-- The "date defaults to today" test freezes the clock
-  (`vi.useFakeTimers({ toFake: ['Date'] })`), so it can't flake at midnight.
+- The developer twice asked Claude to choose the next work, so Claude made the
+  PRODUCT.md call: deleting is in (smallest useful version), editing in place
+  is still undecided. Recorded in `PRODUCT.md`.
+- Each row has a quiet "Delete" on its date line; `window.confirm()` asks
+  first. After deleting, the month's totals, chart, and budgets reload.
+- Tests stub the question with `vi.spyOn(window, 'confirm')`.
 
 Visual identity (Task 13, merged): read `DESIGN.md` before any UI change.
 Money figures use Bodoni Moda at `'opsz' 6` at every size (the display cut
@@ -51,6 +53,9 @@ unattended, so there was no direction round; if they want a different look,
 re-run Impeccable's new-work flow with them.
 
 Small follow-ups found in reviews (not done yet):
+- After deleting a transaction, keyboard focus falls back to the page top
+  (the row and its button are gone). Could move focus to the Transactions
+  heading (needs a ref and `tabIndex={-1}`).
 - "Today" and "this month" are computed when the page loads, so they go
   stale past midnight.
 - Two very fast adds could get responses out of order and briefly show
@@ -82,6 +87,7 @@ Small follow-ups found in reviews (not done yet):
 | GET | `/health` | `{"status": "ok"}` |
 | POST | `/transactions` | Body: `amount` (dollars, > 0, max 2 decimals), `type` (`income`/`expense`), `category`, `description` (optional, ≤ 200 characters), `transaction_date` (`YYYY-MM-DD`). Returns 201. |
 | GET | `/transactions` | Newest date first |
+| DELETE | `/transactions/{id}` | 204; also 204 if already gone; 422 if the id isn't a number |
 | GET | `/summary` | `total_income`, `total_expenses`, `balance` |
 
 Amounts come back as JSON **strings** (`"12.34"`), not numbers. Validation

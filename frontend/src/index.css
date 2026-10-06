@@ -783,3 +783,30 @@ time {
   font-size: 0.875rem;
   color: var(--ink-muted);
 }
+
+/* Quiet until you point at it: deleting is rare, logging is common. It sits
+   on the date's line, so rows don't get taller. */
+.delete-button {
+  margin-left: 0.75rem;
+  padding: 0.125rem 0; /* about 24px tall: big enough to tap */
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  color: var(--expense);
+}
+
+.delete-button:disabled {
+  cursor: wait;
+  text-decoration: none;
+}
+
+.transaction .form-error {
+  margin: 0.25rem 0 0;
+}

@@ -79,9 +79,13 @@ Constraints:
 - Code must stay simple enough for a beginner to understand. Avoid dependencies
   and abstractions that are not needed.
 
+Decided (2026-10-06, Task 15): transactions can be deleted, after a confirm
+step, so a mistaken entry no longer leaves the totals wrong. To fix a typo,
+delete it and add it again.
+
 Undecided:
 
-- Editing and deleting transactions.
+- Editing a transaction in place.
 - Currency handling beyond US-style dollars.
 
 ## Brand Commitments

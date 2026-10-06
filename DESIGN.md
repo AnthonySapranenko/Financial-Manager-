@@ -237,6 +237,7 @@ Firm and plain, like a stamped ticket.
 - **Hover / Focus:** Hover darkens to Deep Note Green. Focus shows a 2px green outline 2px outside the button (the same focus ring is used on every control).
 - **Disabled (saving):** Faded Ink background with a "wait" cursor.
 - **Small (budget "Save"):** White Field with green bold text and a Field Edge outline; hover turns the outline green.
+- **Quiet (transaction "Delete"):** No box: underlined Faded Ink text at 0.875rem, on the same line as the row's date so rows don't grow. Hover turns it Note Seal Red. Deleting is rare and logging is common, so it never competes with the green primary button. It asks with the browser's own confirm box before deleting.
 
 ### Expense / Income toggle
 Two real radio buttons styled as two large side-by-side buttons. Unselected: White Field with a Field Edge outline; hover darkens the outline to ink. Selected "Expense": Pale Seal Red background, 2px Note Seal Red border, red text. Selected "Income": the same in seal green. The padding shrinks by 1px when selected so the button doesn't change size.

@@ -59,6 +59,10 @@ export function createTransaction(transaction) {
   })
 }
 
+export function deleteTransaction(id) {
+  return request(`/transactions/${id}`, { method: 'DELETE' })
+}
+
 export function setBudget(category, amount) {
   return request(`/budgets/${category}`, {
     method: 'PUT',
