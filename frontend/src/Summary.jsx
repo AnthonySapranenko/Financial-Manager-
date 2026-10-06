@@ -1,3 +1,4 @@
+import { monthName } from './dates.js'
 import { formatMoney } from './money.js'
 
 // Puts a sign in front of an amount, except for zero ("+$0.00" looks odd).
@@ -5,9 +6,9 @@ function withSign(sign, amount) {
   return amount === '0.00' ? formatMoney(amount) : sign + formatMoney(amount)
 }
 
-// summary is what GET /summary returns, e.g.
+// summary is what GET /summary?month=... returns, e.g.
 // { total_income: "2400.00", total_expenses: "1353.58", balance: "1046.42" }
-function Summary({ summary, error }) {
+function Summary({ month, summary, error }) {
   let content
   if (error) {
     content = (
@@ -48,6 +49,7 @@ function Summary({ summary, error }) {
 
   return (
     <section className="panel summary" aria-label="Totals">
+      <p className="summary-month">Totals for {monthName(month)}</p>
       {content}
     </section>
   )

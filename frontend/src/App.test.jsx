@@ -48,10 +48,25 @@ const SPENDING = {
 }
 let spending
 
+// What our fake GET /budgets answers: one budget left, one over, one unset.
+const BUDGETS = [
+  { category: 'food', budget: '400.00', spent: '64.18', remaining: '335.82' },
+  { category: 'housing', budget: '1100.00', spent: '1200.00', remaining: '-100.00' },
+  { category: 'health', budget: null, spent: '0.00', remaining: null },
+]
+let budgets
+
 // The fake backend: answers each URL like the real API would.
-function fakeBackend(url) {
-  if (url === '/api/summary') return respond(summary)
+function fakeBackend(url, options) {
   if (url.startsWith('/api/summary/categories')) return respond(spending)
+  if (url.startsWith('/api/summary')) return respond(summary)
+  if (url.startsWith('/api/budgets/')) {
+    // PUT returns the saved budget; DELETE returns 204, no body.
+    return options.method === 'DELETE'
+      ? new Response(null, { status: 204 })
+      : respond({ category: 'food', amount: '450.00' })
+  }
+  if (url.startsWith('/api/budgets')) return respond(budgets)
   return respond(SAVED)
 }
 
@@ -68,9 +83,10 @@ function respond(body, status = 200) {
 beforeEach(() => {
   summary = SUMMARY
   spending = SPENDING
+  budgets = BUDGETS
   vi.stubGlobal(
     'fetch',
-    vi.fn(async (url) => fakeBackend(url)),
+    vi.fn(async (url, options) => fakeBackend(url, options)),
   )
 })
 
@@ -81,6 +97,15 @@ function postCall() {
 
 function totals() {
   return screen.getByRole('region', { name: 'Totals' })
+}
+
+function budgetsPanel() {
+  return screen.getByRole('region', { name: /^Budgets/ })
+}
+
+// The request the app sent with this method, if any: [url, options].
+function callWith(method) {
+  return fetch.mock.calls.find(([, options]) => options?.method === method)
 }
 
 function spendingPanel() {
@@ -297,7 +322,7 @@ test('refreshes the totals after adding a transaction', async () => {
 
 test('a failed summary shows an error but the list still loads', async () => {
   fetch.mockImplementation(async (url) =>
-    url === '/api/summary' ? respond({}, 500) : fakeBackend(url),
+    url.startsWith('/api/summary?') ? respond({}, 500) : fakeBackend(url),
   )
   render(<App />)
 
@@ -387,4 +412,70 @@ test('refreshes spending after adding a transaction', async () => {
   expect(
     await within(spendingPanel()).findByText('Health'),
   ).toBeInTheDocument()
+})
+
+test("the totals strip shows this month's totals", async () => {
+  render(<App />)
+
+  const monthName = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  })
+  expect(within(totals()).getByText(`Totals for ${monthName}`)).toBeInTheDocument()
+  expect(fetch).toHaveBeenCalledWith(`/api/summary?month=${thisMonth()}`, undefined)
+  await within(totals()).findByText('$2,335.82')
+})
+
+test('shows budget left, over budget, and no budget', async () => {
+  render(<App />)
+
+  const rows = await within(budgetsPanel()).findAllByRole('listitem')
+  expect(rows[0]).toHaveTextContent('$64.18 of $400.00$335.82 left')
+  expect(rows[1]).toHaveTextContent('$1,200.00 of $1,100.00Over by $100.00')
+  expect(rows[2]).toHaveTextContent('$0.00 spent · no budget')
+  expect(within(rows[0]).getByLabelText('Food')).toHaveValue('400.00')
+})
+
+test('saving a budget sends it and reloads the budgets', async () => {
+  render(<App />)
+  await within(budgetsPanel()).findAllByRole('listitem')
+  budgets = [
+    { category: 'food', budget: '450.00', spent: '64.18', remaining: '385.82' },
+  ]
+
+  fireEvent.change(screen.getByLabelText('Food'), { target: { value: '450' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Save Food budget' }))
+
+  expect(await within(budgetsPanel()).findByText(/\$385\.82 left/)).toBeInTheDocument()
+  const [url, options] = callWith('PUT')
+  expect(url).toBe('/api/budgets/food')
+  expect(JSON.parse(options.body)).toEqual({ amount: '450' })
+})
+
+test('saving an empty box removes the budget', async () => {
+  render(<App />)
+  await within(budgetsPanel()).findAllByRole('listitem')
+  budgets = [{ category: 'food', budget: null, spent: '64.18', remaining: null }]
+
+  fireEvent.change(screen.getByLabelText('Food'), { target: { value: '' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Save Food budget' }))
+
+  expect(
+    await within(budgetsPanel()).findByText('$64.18 spent · no budget'),
+  ).toBeInTheDocument()
+  expect(callWith('DELETE')[0]).toBe('/api/budgets/food')
+})
+
+test("shows the backend's message when a budget is refused", async () => {
+  render(<App />)
+  await within(budgetsPanel()).findAllByRole('listitem')
+  fetch.mockResolvedValueOnce(
+    respond({ detail: "Salary is income, so it can't have a budget." }, 422),
+  )
+
+  fireEvent.click(screen.getByRole('button', { name: 'Save Food budget' }))
+
+  expect(await within(budgetsPanel()).findByRole('alert')).toHaveTextContent(
+    "Salary is income, so it can't have a budget.",
+  )
 })

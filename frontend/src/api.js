@@ -11,8 +11,12 @@ async function request(path, options) {
   }
 
   if (response.status === 422) {
-    // FastAPI's validation errors: { detail: [{ loc: [..., "amount"], msg: "..." }] }
     const body = await response.json()
+    // Our own rules send plain text: { detail: "Salary is income, ..." }
+    if (typeof body.detail === 'string') {
+      throw new Error(body.detail)
+    }
+    // FastAPI's validation errors: { detail: [{ loc: [..., "amount"], msg: "..." }] }
     const messages = body.detail.map((problem) => `${problem.loc.at(-1)}: ${problem.msg}`)
     throw new Error(messages.join(' '))
   }
@@ -23,6 +27,10 @@ async function request(path, options) {
     )
   }
 
+  // 204 means "done, nothing to send back" (e.g. after a DELETE).
+  if (response.status === 204) {
+    return null
+  }
   return response.json()
 }
 
@@ -30,13 +38,17 @@ export function getTransactions() {
   return request('/transactions')
 }
 
-export function getSummary() {
-  return request('/summary')
+// month is "YYYY-MM" everywhere below.
+export function getSummary(month) {
+  return request(`/summary?month=${month}`)
 }
 
-// month is "YYYY-MM"
 export function getCategorySpending(month) {
   return request(`/summary/categories?month=${month}`)
+}
+
+export function getBudgets(month) {
+  return request(`/budgets?month=${month}`)
 }
 
 export function createTransaction(transaction) {
@@ -45,4 +57,16 @@ export function createTransaction(transaction) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(transaction),
   })
+}
+
+export function setBudget(category, amount) {
+  return request(`/budgets/${category}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount }),
+  })
+}
+
+export function clearBudget(category) {
+  return request(`/budgets/${category}`, { method: 'DELETE' })
 }

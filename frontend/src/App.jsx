@@ -1,19 +1,29 @@
 import { useEffect, useState } from 'react'
 import {
+  clearBudget,
   createTransaction,
+  getBudgets,
   getCategorySpending,
   getSummary,
   getTransactions,
+  setBudget,
 } from './api.js'
+import Budgets from './Budgets.jsx'
 import CategorySpending from './CategorySpending.jsx'
+import { currentMonth } from './dates.js'
 import Summary from './Summary.jsx'
 import TransactionForm from './TransactionForm.jsx'
 import TransactionList from './TransactionList.jsx'
 
-// This month as "YYYY-MM", in the user's own time zone.
-function currentMonth() {
-  const now = new Date()
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+// Fetch one thing and store it, or store its error. Each piece of data has
+// its own error, so one failing doesn't hide the others.
+async function refresh(fetchIt, setData, setError) {
+  try {
+    setData(await fetchIt())
+    setError('')
+  } catch (error) {
+    setError(error.message)
+  }
 }
 
 function App() {
@@ -23,19 +33,27 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
 
-  // The totals from GET /summary. null means "not loaded yet".
+  // This month's numbers, all calculated by the backend. null = not loaded yet.
+  const month = currentMonth()
   const [summary, setSummary] = useState(null)
   const [summaryError, setSummaryError] = useState('')
-
-  // This month's spending per category, from GET /summary/categories.
-  const month = currentMonth()
   const [spending, setSpending] = useState(null)
   const [spendingError, setSpendingError] = useState('')
+  const [budgets, setBudgets] = useState(null)
+  const [budgetsError, setBudgetsError] = useState('')
 
-  // Load everything once, after the first render. The three requests run at
-  // the same time, and each has its own error, so one failing
-  // doesn't hide the other. (In development, React runs effects twice on
-  // purpose to catch bugs; `ignore` makes the first, cancelled run harmless.)
+  // Reload everything that depends on this month's transactions. We never add
+  // up money in the browser: the backend does it in whole cents.
+  function refreshMonth() {
+    refresh(() => getSummary(month), setSummary, setSummaryError)
+    refresh(() => getCategorySpending(month), setSpending, setSpendingError)
+    refresh(() => getBudgets(month), setBudgets, setBudgetsError)
+  }
+
+  // Load everything once, after the first render. (In development, React runs
+  // effects twice on purpose to catch bugs; `ignore` makes the first,
+  // cancelled list load harmless. A second refreshMonth just stores the same
+  // numbers again.)
   useEffect(() => {
     let ignore = false
 
@@ -50,46 +68,16 @@ function App() {
         if (!ignore) setLoading(false)
       })
 
-    getSummary()
-      .then((data) => {
-        if (!ignore) setSummary(data)
-      })
-      .catch((error) => {
-        if (!ignore) setSummaryError(error.message)
-      })
-
-    getCategorySpending(currentMonth())
-      .then((data) => {
-        if (!ignore) setSpending(data)
-      })
-      .catch((error) => {
-        if (!ignore) setSpendingError(error.message)
-      })
+    refreshMonth()
 
     return () => {
       ignore = true
     }
+    // The empty list [] means "run once". The linter wants refreshMonth listed,
+    // but it's a new function on every render, so listing it would reload on
+    // every render. Running once is what we want here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  // Ask the backend for fresh totals. We never add up money in the browser:
-  // the backend does it in whole cents, so there's one source of truth.
-  async function refreshSummary() {
-    try {
-      setSummary(await getSummary())
-      setSummaryError('')
-    } catch (error) {
-      setSummaryError(error.message)
-    }
-  }
-
-  async function refreshSpending() {
-    try {
-      setSpending(await getCategorySpending(currentMonth()))
-      setSpendingError('')
-    } catch (error) {
-      setSpendingError(error.message)
-    }
-  }
 
   // Save first, then show what the backend saved (it has the real id).
   // If saving fails, the error goes back to the form, which shows it.
@@ -97,10 +85,19 @@ function App() {
     const saved = await createTransaction(transaction)
     // Make a new array instead of changing the old one, so React notices.
     setTransactions((current) => [saved, ...current])
-    // Not awaited: the form can clear right away. The refresh functions
-    // handle their own errors, because the transaction is already saved.
-    refreshSummary()
-    refreshSpending()
+    // Not awaited: the form can clear right away. refresh handles its own
+    // errors, because the transaction is already saved.
+    refreshMonth()
+  }
+
+  // An empty box means "no budget". Errors go back to that budget's row.
+  async function saveBudget(category, amount) {
+    if (amount === '') {
+      await clearBudget(category)
+    } else {
+      await setBudget(category, amount)
+    }
+    await refresh(() => getBudgets(month), setBudgets, setBudgetsError)
   }
 
   return (
@@ -109,7 +106,7 @@ function App() {
         <h1>Finance Manager</h1>
         <p className="note">Practice app: use made-up data only.</p>
       </header>
-      <Summary summary={summary} error={summaryError} />
+      <Summary month={month} summary={summary} error={summaryError} />
       <div className="layout">
         <TransactionForm onAdd={addTransaction} />
         <div className="column">
@@ -117,6 +114,12 @@ function App() {
             month={month}
             data={spending}
             error={spendingError}
+          />
+          <Budgets
+            month={month}
+            budgets={budgets}
+            error={budgetsError}
+            onSave={saveBudget}
           />
           <TransactionList
             transactions={transactions}
