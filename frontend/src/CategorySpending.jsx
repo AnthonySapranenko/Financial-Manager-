@@ -1,11 +1,13 @@
 import { monthName } from './dates.js'
 import { formatMoney } from './money.js'
 
-// Slots 1-5 of a colorblind-checked chart palette, used largest slice first.
-// Neighbors stay distinguishable for colorblind readers; the legend still
-// names every slice, so color is never the only clue.
-const COLORS = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4']
-const FOLDED_COLOR = '#afb8c1' // gray for "N more categories"
+// Banknote ink colors, used largest slice first: note green, certificate
+// gold, seal blue, sage, and brown. Neighbors alternate dark and light, so
+// they stay distinguishable even without color vision; the legend still
+// names every slice, so color is never the only clue. No red: on this page
+// red means "expense" and "over budget".
+const COLORS = ['#1e4a34', '#c9962b', '#3b6ea5', '#9fbf9a', '#7a5232']
+const FOLDED_COLOR = '#c3cbc4' // pale gray for "N more categories"
 
 // A donut stays readable with at most 6 slices: the 5 largest, plus one for
 // everything else.

@@ -1,21 +1,45 @@
+/*
+ * Visual identity: US banknote engraving (see DESIGN.md).
+ * Pale currency paper, green-black ink, the green and red of Treasury and
+ * United States Note seals, and fine diagonal "engraved" lines for fills.
+ */
+
+/* Bodoni Moda (SIL Open Font License), self-hosted from Google Fonts' Latin
+   file. One variable file covers weights 400-700. */
+@font-face {
+  font-family: 'Bodoni Moda';
+  src: url('/fonts/bodoni-moda-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
 /* Colors live in one place so they're easy to change later. */
 :root {
-  --text: #1f2328;
-  --text-muted: #59636e;
-  --background: #f6f8fa;
-  --surface: #ffffff;
-  --border: #d1d9e0;
-  --accent: #0969da;
-  --income: #1a7f37;
-  --income-soft: #dafbe1;
-  --expense: #cf222e;
-  --expense-soft: #ffebe9;
+  --paper: #e9eee6; /* page ground: currency paper, green-grey */
+  --sheet: #f8faf5; /* panels: a lighter sheet on the paper */
+  --field: #ffffff; /* inputs */
+  --ink: #17201b; /* intaglio black-green: body text */
+  --ink-muted: #4c5850; /* secondary text, still 6:1 on paper */
+  --rule: #c3cdc2; /* hairlines between rows */
+  --field-border: #84928a; /* input outlines: 3:1 against white */
+  --green: #1e4a34; /* back-of-the-note green: masthead, buttons, focus */
+  --green-dark: #143426; /* button hover */
+  --on-green: #eef4ee; /* text on the green band */
+  --on-green-muted: #b9d0c0;
+  --income: #1b6a42; /* Treasury seal green */
+  --income-soft: #dcebdf;
+  --expense: #ad2219; /* United States Note seal red */
+  --expense-soft: #f6e2df;
+
+  --figures: 'Bodoni Moda', 'Palatino Linotype', Palatino, Georgia, serif;
 
   font-family: system-ui, sans-serif;
   line-height: 1.5;
-  color: var(--text);
-  background: var(--background);
-  accent-color: var(--accent);
+  color: var(--ink);
+  background: var(--paper);
+  accent-color: var(--green);
+  caret-color: var(--green);
+  scrollbar-color: var(--field-border) var(--paper);
 }
 
 body {
@@ -23,98 +47,316 @@ body {
 }
 
 ::selection {
-  background: #b6e3ff;
+  background: #c5ddcb;
+  color: var(--ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--green);
   outline-offset: 2px;
 }
 
-main {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 1.5rem 1rem 3rem;
-}
-
-h1 {
-  margin: 0;
-  font-size: 1.75rem;
+h1,
+h2 {
+  font-family: var(--figures);
+  font-weight: 600;
+  text-wrap: balance;
 }
 
 h2 {
   margin: 0 0 1rem;
-  font-size: 1.125rem;
+  font-size: 1.375rem;
+  line-height: 1.2;
 }
 
 .note {
-  margin: 0.25rem 0 1.5rem;
-  color: var(--text-muted);
+  margin: -0.5rem 0 1rem;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
 }
 
-/* Phone: form above list. Wide screens: form on the left, list on the right. */
+/* ---- Masthead: the green band across the top ---- */
+
+.masthead {
+  /* The hatched line at the bottom is the "engraving" pattern used for
+     every fill on the page: thin diagonal stripes, drawn with a gradient. */
+  border-bottom: 6px solid transparent;
+  border-image: repeating-linear-gradient(
+      -45deg,
+      var(--green) 0 1.5px,
+      transparent 1.5px 4px
+    )
+    6;
+  background: var(--green) padding-box;
+  color: var(--on-green);
+  padding: 1rem max(1rem, (100% - 75rem) / 2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+}
+
+.masthead h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.masthead p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--on-green-muted);
+}
+
+main {
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+/* ---- Layout ----
+   Phone: one column, in the order of the HTML (form, transactions, month).
+   Tablet: form and transactions side by side, the month's panels below.
+   Desktop: three columns. Grid areas name each block, so each layout is
+   just a different "map" of the same names. */
+
 .layout {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+  grid-template-areas:
+    'form'
+    'list'
+    'month';
+}
+
+.transaction-form {
+  grid-area: form;
+}
+
+.transactions {
+  grid-area: list;
+}
+
+.month {
+  grid-area: month;
   display: grid;
   gap: 1.5rem;
   align-items: start;
 }
 
-@media (min-width: 768px) {
+/* Phones: tighter spacing at the top, so the whole "Add transaction" form
+   fits on the first screen without scrolling. */
+@media (max-width: 767px) {
+  .masthead {
+    padding-block: 0.625rem;
+  }
+
+  .masthead h1 {
+    font-size: 1.25rem;
+  }
+
+  .masthead p {
+    font-size: 0.8125rem;
+    line-height: 1.3;
+  }
+
+  main {
+    padding-top: 1rem;
+  }
+
+  .summary {
+    margin-bottom: 1rem;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .summary-month {
+    margin-bottom: 0.25rem;
+  }
+
+  .totals .balance {
+    font-size: 1.75rem;
+  }
+
   .layout {
-    grid-template-columns: 20rem 1fr;
+    gap: 2rem;
+  }
+
+  .transaction-form {
+    gap: 0.75rem;
+  }
+
+  .transaction-form h2 {
+    font-size: 1.25rem;
+  }
+
+  .field input,
+  .field select {
+    padding-block: 0.4375rem;
+  }
+
+  /* "Expense" and "Income" explain themselves, so on phones the "Type"
+     label is hidden from view but still read out by screen readers. */
+  .type-toggle legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .type-option span {
+    padding: 0.5rem;
+  }
+
+  .type-option.expense input:checked + span,
+  .type-option.income input:checked + span {
+    padding: calc(0.5rem - 1px);
+  }
+
+  .form-error {
+    margin-top: -0.25rem;
   }
 }
 
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.25rem;
+@media (min-width: 768px) {
+  .layout {
+    grid-template-columns: 19rem minmax(0, 1fr);
+    grid-template-areas:
+      'form list'
+      'month month';
+  }
+
+  .month {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* While scrolling a long list, the form stays in view. */
+  .transaction-form {
+    position: sticky;
+    top: 1rem;
+  }
 }
 
-/* ---- Totals ---- */
+@media (min-width: 1100px) {
+  .layout {
+    grid-template-columns: 19rem minmax(0, 1fr) 22rem;
+    grid-template-areas: 'form list month';
+  }
 
+  .month {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sections sit straight on the paper, no boxes: a double rule on top, like
+   the ruled heads of a printed note, separates them. */
+.panel {
+  border-top: 3px double var(--ink);
+  padding-top: 0.75rem;
+  /* Lets panels change their own layout based on their own width
+     (see the @container rule for the spending chart). */
+  container-type: inline-size;
+}
+
+/* ---- Totals: the month's arithmetic, framed like a note ---- */
+
+/* The one fully framed object on the page. */
 .summary {
   margin-bottom: 1.5rem;
+  background: var(--sheet);
+  border: 3px double var(--ink);
+  padding: 1rem 1.25rem;
 }
 
-/* Phone: one line per total, label left and amount right. */
+.summary-month {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+/* Phone: income and expenses side by side, then the balance under a rule
+   across the full width, like the answer of a sum written on paper. */
 .totals {
   display: grid;
-  gap: 0.375rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 1rem;
   margin: 0;
 }
 
-.totals div {
+.totals div:last-child {
+  grid-column: 1 / -1;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 1rem;
 }
 
 .totals dt {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--ink-muted);
 }
 
 .totals dd {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
 }
 
-/* Wide screens: three totals side by side, label above amount. */
-@media (min-width: 768px) {
+/* The balance sits under a rule, like the answer of a written sum. */
+.totals div:last-child {
+  border-top: 1px solid var(--ink);
+  margin-top: 0.25rem;
+  padding-top: 0.375rem;
+}
+
+.totals .balance {
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+/* Wide screens: income − expenses = balance, read left to right as one
+   equation. "subgrid" makes all three label/amount pairs share the same two
+   rows, so the labels line up even though the balance is bigger. */
+@media (min-width: 640px) {
   .totals {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: repeat(3, auto);
+    grid-template-rows: auto auto;
+    justify-content: start;
+    column-gap: 2.5rem;
+    row-gap: 0;
   }
 
   .totals div {
-    display: block;
+    display: grid;
+    grid-row: span 2;
+    grid-template-rows: subgrid;
+    align-items: end;
+  }
+
+  .totals div:last-child {
+    grid-column: auto;
+    display: grid;
+    gap: 0;
+    border-top: 0;
+    margin: 0;
+    padding: 0;
   }
 
   .totals dd {
-    font-size: 1.375rem;
+    font-size: 1.625rem;
+  }
+
+  .totals .balance {
+    font-size: 2.75rem;
+  }
+
+  /* Decoration only (CSS content isn't part of the page's text). */
+  .totals .balance::before {
+    content: '= ';
+    color: var(--ink-muted);
   }
 }
 
@@ -127,6 +369,18 @@ h2 {
 
 .transaction-form h2 {
   margin: 0; /* the grid gap already spaces it */
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* Let the inputs shrink to fit their half of the row. */
+.field-row input,
+.field-row select {
+  min-width: 0;
 }
 
 .field {
@@ -147,10 +401,15 @@ button {
 .field select {
   font-weight: 400;
   padding: 0.5rem 0.625rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface);
-  color: var(--text);
+  border: 1px solid var(--field-border);
+  border-radius: 2px;
+  background: var(--field);
+  color: var(--ink);
+}
+
+.field input::placeholder,
+.budget-form input::placeholder {
+  color: #6b766f; /* 4.6:1 on white */
 }
 
 .field input[aria-invalid='true'] {
@@ -197,62 +456,64 @@ button {
   padding: 0.625rem;
   text-align: center;
   font-weight: 600;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  background: var(--field);
+  border: 1px solid var(--field-border);
+  border-radius: 2px;
   cursor: pointer;
 }
 
+.type-option span:hover {
+  border-color: var(--ink);
+}
+
 .type-option input:focus-visible + span {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--green);
   outline-offset: 2px;
 }
 
 .type-option.expense input:checked + span {
   background: var(--expense-soft);
-  border-color: var(--expense);
+  border: 2px solid var(--expense);
+  padding: calc(0.625rem - 1px); /* thicker border, same size */
   color: var(--expense);
 }
 
 .type-option.income input:checked + span {
   background: var(--income-soft);
-  border-color: var(--income);
+  border: 2px solid var(--income);
+  padding: calc(0.625rem - 1px);
   color: var(--income);
 }
 
 button[type='submit'] {
   padding: 0.75rem;
   font-weight: 600;
-  color: #ffffff;
-  background: var(--accent);
+  color: var(--on-green);
+  background: var(--green);
   border: 0;
-  border-radius: 6px;
+  border-radius: 2px;
   cursor: pointer;
 }
 
 button[type='submit']:hover {
-  background: #0757b8;
+  background: var(--green-dark);
 }
 
 button[type='submit']:disabled {
-  background: var(--text-muted);
+  background: var(--ink-muted);
   cursor: wait;
 }
 
 /* ---- Spending by category ---- */
 
-.column {
-  display: grid;
-  gap: 1.5rem;
-}
-
-/* Phone: donut above the legend. Wide: donut left, legend right. */
+/* Narrow panel: donut above the legend. Wide panel: donut left. */
 .spending {
   display: grid;
   gap: 1.25rem;
   justify-items: center;
 }
 
-@media (min-width: 560px) {
+@container (min-width: 26rem) {
   .spending {
     grid-template-columns: 10rem 1fr;
     align-items: center;
@@ -278,12 +539,12 @@ button[type='submit']:disabled {
   place-content: center;
   text-align: center;
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--ink-muted);
 }
 
 .donut-total .amount {
   font-size: 1rem;
-  color: var(--text);
+  color: var(--ink);
 }
 
 .legend {
@@ -305,26 +566,20 @@ button[type='submit']:disabled {
 .swatch {
   width: 0.75rem;
   height: 0.75rem;
-  border-radius: 3px;
+  border-radius: 1px;
 }
 
 .legend .amount {
-  font-weight: 400;
+  font-weight: 600;
 }
 
 .percent {
   text-align: right;
-  color: var(--text-muted);
+  color: var(--ink-muted);
   font-variant-numeric: tabular-nums;
 }
 
 /* ---- Budgets ---- */
-
-.summary-month {
-  margin: 0 0 0.5rem;
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
 
 .budget-list {
   list-style: none;
@@ -333,8 +588,8 @@ button[type='submit']:disabled {
 }
 
 .budget {
-  padding: 0.75rem 0;
-  border-top: 1px solid var(--border);
+  padding: 0.625rem 0;
+  border-top: 1px solid var(--rule);
 }
 
 .budget:first-child {
@@ -344,7 +599,7 @@ button[type='submit']:disabled {
 
 .budget-form {
   display: grid;
-  grid-template-columns: 1fr 7.5rem auto;
+  grid-template-columns: 1fr 6.5rem auto;
   gap: 0.5rem;
   align-items: center;
 }
@@ -356,70 +611,104 @@ button[type='submit']:disabled {
 .budget-form input {
   width: 100%;
   box-sizing: border-box;
-  padding: 0.375rem 0.5rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  padding: 0.3125rem 0.5rem;
+  border: 1px solid var(--field-border);
+  border-radius: 2px;
+  background: var(--field);
+  color: var(--ink);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
 .budget-form button {
-  padding: 0.375rem 0.75rem;
+  padding: 0.3125rem 0.75rem;
   font-weight: 600;
-  color: var(--accent);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  color: var(--green);
+  background: var(--field);
+  border: 1px solid var(--field-border);
+  border-radius: 2px;
   cursor: pointer;
 }
 
 .budget-form button:hover {
-  border-color: var(--accent);
+  border-color: var(--green);
 }
 
 .budget-form button:disabled {
-  color: var(--text-muted);
+  color: var(--ink-muted);
   cursor: wait;
 }
 
 .budget-status {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  gap: 1rem;
+  align-items: baseline;
+  gap: 0 1rem;
   margin: 0.375rem 0 0;
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--ink-muted);
   font-variant-numeric: tabular-nums;
 }
 
+/* Over budget "stamps" itself: red capitals in a red box. */
 .budget-status .over {
   color: var(--expense);
+  border: 1.5px solid var(--expense);
+  border-radius: 2px;
+  padding: 0 0.375rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-/* The bar: a gray track with a filled part whose width is spent / budget. */
+/* The bar: an outlined track, filled with engraved lines up to spent / budget. */
 .meter {
-  height: 6px;
+  height: 8px;
   margin-top: 0.375rem;
-  background: var(--border);
-  border-radius: 3px;
-  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: var(--field);
 }
 
 .meter div {
   height: 100%;
-  background: var(--accent);
-  border-radius: 3px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--green) 0 1.5px,
+    transparent 1.5px 3.5px
+  );
+  box-shadow: inset -1.5px 0 var(--green); /* a solid edge where it ends */
+  transform-origin: left;
+  animation: engrave 700ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .meter.over div {
-  background: var(--expense);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--expense) 0 2px,
+    transparent 2px 3px
+  );
+  box-shadow: none;
+}
+
+/* The page's one motion: meters are "engraved" left to right on load. */
+@keyframes engrave {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meter div {
+    animation: none;
+  }
 }
 
 /* ---- List ---- */
 
 .empty {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--ink-muted);
 }
 
 .load-error {
@@ -438,7 +727,7 @@ button[type='submit']:disabled {
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--rule);
 }
 
 .transaction:first-child {
@@ -454,7 +743,7 @@ button[type='submit']:disabled {
 
 .description {
   display: block;
-  color: var(--text-muted);
+  color: var(--ink-muted);
   overflow-wrap: anywhere; /* long words can't push the amount off screen */
 }
 
@@ -463,10 +752,22 @@ button[type='submit']:disabled {
   white-space: nowrap;
 }
 
+/* Every money figure is set in the note's typeface, with digits of equal
+   width so amounts line up in a column. */
 .amount {
   display: block;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums; /* digits line up in a column */
+  font-family: var(--figures);
+  font-weight: 700;
+  font-variant-numeric: lining-nums tabular-nums;
+  /* Bodoni's display cut has hairline strokes that make "4" look like "1"
+     and hide the + and − signs. Its small-text cut ("optical size" 6) has
+     sturdy strokes, so money always uses that, at any size. (Even the big
+     balance: in the display cut a negative balance's "−" is a hairline.) */
+  font-variation-settings: 'opsz' 6;
+}
+
+.transaction .amount {
+  font-size: 1.125rem;
 }
 
 .amount.income {
@@ -479,5 +780,5 @@ button[type='submit']:disabled {
 
 time {
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--ink-muted);
 }

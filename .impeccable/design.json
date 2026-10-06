@@ -1,0 +1,557 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T22:50:26.583Z",
+  "title": "Design System: Finance Manager",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Currency Paper",
+        "canonical": "#e9eee6",
+        "tonalRamp": [
+          "#090c07",
+          "#232621",
+          "#3f433d",
+          "#5f635c",
+          "#7f847d",
+          "#a2a79f",
+          "#c6cbc3",
+          "#ebf0e8"
+        ]
+      },
+      "sheet": {
+        "role": "neutral",
+        "displayName": "Clean Sheet",
+        "canonical": "#f8faf5",
+        "tonalRamp": [
+          "#0a0c09",
+          "#242622",
+          "#41433f",
+          "#60625e",
+          "#81837f",
+          "#a4a6a1",
+          "#c8cac5",
+          "#edefea"
+        ]
+      },
+      "field": {
+        "role": "neutral",
+        "displayName": "White Field",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Engraving Ink",
+        "canonical": "#17201b",
+        "tonalRamp": [
+          "#060d09",
+          "#1e2822",
+          "#3b453f",
+          "#5a645e",
+          "#7a857f",
+          "#9da8a2",
+          "#c1cdc6",
+          "#e6f2eb"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Faded Ink",
+        "canonical": "#4c5850",
+        "tonalRamp": [
+          "#050e08",
+          "#1d2821",
+          "#3a453e",
+          "#59655d",
+          "#79867d",
+          "#9ca9a0",
+          "#bfcdc4",
+          "#e4f3e9"
+        ]
+      },
+      "placeholder": {
+        "role": "neutral",
+        "displayName": "Placeholder Ink",
+        "canonical": "#6b766f",
+        "tonalRamp": [
+          "#060d08",
+          "#1e2822",
+          "#3b453f",
+          "#5a645e",
+          "#7a867e",
+          "#9da8a1",
+          "#c1cdc5",
+          "#e6f2ea"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#c3cdc2",
+        "tonalRamp": [
+          "#070d06",
+          "#20271f",
+          "#3c453c",
+          "#5b645a",
+          "#7c857b",
+          "#9fa89e",
+          "#c2ccc1",
+          "#e8f2e7"
+        ]
+      },
+      "field-border": {
+        "role": "neutral",
+        "displayName": "Field Edge",
+        "canonical": "#84928a",
+        "tonalRamp": [
+          "#040e08",
+          "#1d2822",
+          "#39453e",
+          "#58655d",
+          "#78867e",
+          "#9ba9a1",
+          "#bfcdc5",
+          "#e4f3ea"
+        ]
+      },
+      "green": {
+        "role": "primary",
+        "displayName": "Back-of-the-Note Green",
+        "canonical": "#1e4a34",
+        "tonalRamp": [
+          "#000f06",
+          "#012d1a",
+          "#204c36",
+          "#406c55",
+          "#618e75",
+          "#83b197",
+          "#a7d6bb",
+          "#ccfce0"
+        ]
+      },
+      "green-dark": {
+        "role": "primary",
+        "displayName": "Deep Note Green",
+        "canonical": "#143426",
+        "tonalRamp": [
+          "#000f07",
+          "#0b2c1e",
+          "#2a4a3b",
+          "#496a5a",
+          "#698b7a",
+          "#8caf9d",
+          "#afd3c0",
+          "#d4f9e6"
+        ]
+      },
+      "on-green": {
+        "role": "primary",
+        "displayName": "Pale Note Light",
+        "canonical": "#eef4ee",
+        "tonalRamp": [
+          "#090c09",
+          "#222622",
+          "#3f433f",
+          "#5e635e",
+          "#7f847f",
+          "#a1a7a1",
+          "#c5cbc5",
+          "#eaf0ea"
+        ]
+      },
+      "on-green-muted": {
+        "role": "primary",
+        "displayName": "Faded Note Light",
+        "canonical": "#b9d0c0",
+        "tonalRamp": [
+          "#010f06",
+          "#172a1e",
+          "#34473a",
+          "#536759",
+          "#73897a",
+          "#95ac9c",
+          "#b9d0c0",
+          "#def6e5"
+        ]
+      },
+      "income": {
+        "role": "secondary",
+        "displayName": "Treasury Seal Green",
+        "canonical": "#1b6a42",
+        "tonalRamp": [
+          "#000f05",
+          "#012e18",
+          "#02502d",
+          "#257249",
+          "#4a9469",
+          "#6eb88b",
+          "#92ddaf",
+          "#c5ffda"
+        ]
+      },
+      "income-soft": {
+        "role": "secondary",
+        "displayName": "Pale Seal Green",
+        "canonical": "#dcebdf",
+        "tonalRamp": [
+          "#050e07",
+          "#1d2820",
+          "#39463c",
+          "#58655b",
+          "#79867c",
+          "#9ba99e",
+          "#bfcec2",
+          "#e4f3e7"
+        ]
+      },
+      "expense": {
+        "role": "secondary",
+        "displayName": "Note Seal Red",
+        "canonical": "#ad2219",
+        "tonalRamp": [
+          "#1e0000",
+          "#4c0201",
+          "#7f0604",
+          "#af251b",
+          "#d74d3f",
+          "#fc7665",
+          "#ffb3a7",
+          "#fee9e5"
+        ]
+      },
+      "expense-soft": {
+        "role": "secondary",
+        "displayName": "Pale Seal Red",
+        "canonical": "#f6e2df",
+        "tonalRamp": [
+          "#130806",
+          "#2f211f",
+          "#4d3e3b",
+          "#6e5d5a",
+          "#8f7e7b",
+          "#b3a09d",
+          "#d7c4c1",
+          "#fde9e6"
+        ]
+      },
+      "chart-gold": {
+        "role": "tertiary",
+        "displayName": "Certificate Gold",
+        "canonical": "#c9962b",
+        "tonalRamp": [
+          "#120900",
+          "#322202",
+          "#563d05",
+          "#7e5a00",
+          "#a87901",
+          "#cf9b32",
+          "#f5c05c",
+          "#ffeccc"
+        ]
+      },
+      "chart-blue": {
+        "role": "tertiary",
+        "displayName": "Seal Blue",
+        "canonical": "#3b6ea5",
+        "tonalRamp": [
+          "#000b1d",
+          "#022548",
+          "#0c4376",
+          "#31649a",
+          "#5286be",
+          "#74a9e4",
+          "#a1cdff",
+          "#e4f0fe"
+        ]
+      },
+      "chart-sage": {
+        "role": "tertiary",
+        "displayName": "Sage",
+        "canonical": "#9fbf9a",
+        "tonalRamp": [
+          "#001000",
+          "#122c0e",
+          "#2f4a2b",
+          "#4d6a49",
+          "#6e8c69",
+          "#90af8b",
+          "#b3d4ae",
+          "#d8fad3"
+        ]
+      },
+      "chart-brown": {
+        "role": "tertiary",
+        "displayName": "Engraver's Brown",
+        "canonical": "#7a5232",
+        "tonalRamp": [
+          "#160700",
+          "#3a1c01",
+          "#5e3817",
+          "#7f5737",
+          "#a37857",
+          "#c79b79",
+          "#edbf9c",
+          "#feeadb"
+        ]
+      },
+      "chart-folded": {
+        "role": "tertiary",
+        "displayName": "Folded Grey",
+        "canonical": "#c3cbc4",
+        "tonalRamp": [
+          "#080d08",
+          "#212722",
+          "#3d443e",
+          "#5c635d",
+          "#7d857e",
+          "#a0a7a1",
+          "#c4ccc5",
+          "#e9f1ea"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "brand": {
+        "displayName": "Brand",
+        "purpose": "App name in the masthead only; uppercase, 1.25rem on phones."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles."
+      },
+      "figure-balance": {
+        "displayName": "Balance figure",
+        "purpose": "The balance in the totals plate; 2rem below 640px, 1.75rem on phones. Always 'opsz' 6."
+      },
+      "figure-total": {
+        "displayName": "Total figure",
+        "purpose": "Income and expenses in the totals plate; 1.25rem below 640px. Always 'opsz' 6."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Every other money amount (1rem in the chart and legend). Always 'opsz' 6."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Everyday text; inputs and buttons never go below 1rem."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Form labels, totals labels, notes."
+      },
+      "stamp": {
+        "displayName": "Stamp",
+        "purpose": "The uppercase \"Over by $…\" stamp only."
+      }
+    },
+    "shadows": [],
+    "borders": [
+      {
+        "name": "section-rule",
+        "value": "3px double var(--ink)",
+        "purpose": "Top of every work area; all four sides of the totals plate only."
+      },
+      {
+        "name": "hairline",
+        "value": "1px solid var(--rule)",
+        "purpose": "Between list rows; meter track outline."
+      },
+      {
+        "name": "sum-rule",
+        "value": "1px solid var(--ink)",
+        "purpose": "Above the balance on phones, like the answer of a written sum."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 2px solid var(--green); outline-offset: 2px",
+        "purpose": "Focus on every interactive element."
+      }
+    ],
+    "patterns": [
+      {
+        "name": "engraving-hatch",
+        "value": "repeating-linear-gradient(-45deg, var(--green) 0 1.5px, transparent 1.5px 3.5px)",
+        "purpose": "Meter fill. The masthead edge uses 1.5px lines every 4px. Over budget: var(--expense) 0 2px, transparent 2px 3px."
+      }
+    ],
+    "motion": [
+      {
+        "name": "engrave",
+        "value": "transform scaleX(0) to none, 700ms cubic-bezier(0.16, 1, 0.3, 1), transform-origin left",
+        "purpose": "The only motion: budget meters engrave in on load. Off under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "totals-equation",
+        "value": "640px"
+      },
+      {
+        "name": "phone-max",
+        "value": "767px"
+      },
+      {
+        "name": "tablet",
+        "value": "768px"
+      },
+      {
+        "name": "desktop",
+        "value": "1100px"
+      },
+      {
+        "name": "chart-side-by-side (container width)",
+        "value": "26rem"
+      }
+    ],
+    "colorScheme": "light only"
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main \"Add transaction\" button, full width of the form.",
+      "html": "<button class=\"ds-btn-primary\">Add transaction</button>",
+      "css": ":host{--paper:#e9eee6;--sheet:#f8faf5;--field:#ffffff;--ink:#17201b;--ink-muted:#4c5850;--rule:#c3cdc2;--field-border:#84928a;--green:#1e4a34;--green-dark:#143426;--on-green:#eef4ee;--on-green-muted:#b9d0c0;--income:#1b6a42;--income-soft:#dcebdf;--expense:#ad2219;--expense-soft:#f6e2df;--figures:'Bodoni Moda','Palatino Linotype',Palatino,Georgia,serif;} .ds-btn-primary{font:600 1rem system-ui,sans-serif;padding:0.75rem;width:19rem;color:var(--on-green);background:var(--green);border:0;border-radius:2px;cursor:pointer;} .ds-btn-primary:hover{background:var(--green-dark);} .ds-btn-primary:focus-visible{outline:2px solid var(--green);outline-offset:2px;} .ds-btn-primary:disabled{background:var(--ink-muted);cursor:wait;}"
+    },
+    {
+      "name": "Small Button",
+      "kind": "button",
+      "refersTo": "button-small",
+      "description": "The budget row \"Save\" button: white with green text.",
+      "html": "<button class=\"ds-btn-small\">Save</button>",
+      "css": ":host{--paper:#e9eee6;--sheet:#f8faf5;--field:#ffffff;--ink:#17201b;--ink-muted:#4c5850;--rule:#c3cdc2;--field-border:#84928a;--green:#1e4a34;--green-dark:#143426;--on-green:#eef4ee;--on-green-muted:#b9d0c0;--income:#1b6a42;--income-soft:#dcebdf;--expense:#ad2219;--expense-soft:#f6e2df;--figures:'Bodoni Moda','Palatino Linotype',Palatino,Georgia,serif;} .ds-btn-small{font:600 1rem system-ui,sans-serif;padding:0.3125rem 0.75rem;color:var(--green);background:var(--field);border:1px solid var(--field-border);border-radius:2px;cursor:pointer;} .ds-btn-small:hover{border-color:var(--green);} .ds-btn-small:focus-visible{outline:2px solid var(--green);outline-offset:2px;}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Labelled input on a white field with a 2px corner.",
+      "html": "<label class=\"ds-field\">Amount ($)<input placeholder=\"0.00\" inputmode=\"decimal\"></label>",
+      "css": ":host{--paper:#e9eee6;--sheet:#f8faf5;--field:#ffffff;--ink:#17201b;--ink-muted:#4c5850;--rule:#c3cdc2;--field-border:#84928a;--green:#1e4a34;--green-dark:#143426;--on-green:#eef4ee;--on-green-muted:#b9d0c0;--income:#1b6a42;--income-soft:#dcebdf;--expense:#ad2219;--expense-soft:#f6e2df;--figures:'Bodoni Moda','Palatino Linotype',Palatino,Georgia,serif;} .ds-field{display:grid;gap:0.25rem;width:19rem;font:600 0.875rem system-ui,sans-serif;color:var(--ink);} .ds-field input{font:400 1rem system-ui,sans-serif;padding:0.5rem 0.625rem;border:1px solid var(--field-border);border-radius:2px;background:var(--field);color:var(--ink);} .ds-field input::placeholder{color:#6b766f;} .ds-field input:focus-visible{outline:2px solid var(--green);outline-offset:2px;}"
+    },
+    {
+      "name": "Expense / Income Toggle",
+      "kind": "chip",
+      "refersTo": "type-option",
+      "description": "Two radio buttons styled as large buttons; the selected one takes its seal colour.",
+      "html": "<div class=\"ds-toggle\"><label class=\"ds-opt ds-expense\"><input type=\"radio\" name=\"t\" checked><span>Expense</span></label><label class=\"ds-opt ds-income\"><input type=\"radio\" name=\"t\"><span>Income</span></label></div>",
+      "css": ":host{--paper:#e9eee6;--sheet:#f8faf5;--field:#ffffff;--ink:#17201b;--ink-muted:#4c5850;--rule:#c3cdc2;--field-border:#84928a;--green:#1e4a34;--green-dark:#143426;--on-green:#eef4ee;--on-green-muted:#b9d0c0;--income:#1b6a42;--income-soft:#dcebdf;--expense:#ad2219;--expense-soft:#f6e2df;--figures:'Bodoni Moda','Palatino Linotype',Palatino,Georgia,serif;} .ds-toggle{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;width:19rem;font:600 1rem system-ui,sans-serif;} .ds-opt{position:relative;} .ds-opt input{position:absolute;opacity:0;width:1px;height:1px;} .ds-opt span{display:block;padding:0.625rem;text-align:center;background:var(--field);border:1px solid var(--field-border);border-radius:2px;cursor:pointer;color:var(--ink);} .ds-opt span:hover{border-color:var(--ink);} .ds-opt input:focus-visible+span{outline:2px solid var(--green);outline-offset:2px;} .ds-expense input:checked+span{background:var(--expense-soft);border:2px solid var(--expense);padding:calc(0.625rem - 1px);color:var(--expense);} .ds-income input:checked+span{background:var(--income-soft);border:2px solid var(--income);padding:calc(0.625rem - 1px);color:var(--income);}"
+    },
+    {
+      "name": "Masthead",
+      "kind": "nav",
+      "refersTo": "masthead",
+      "description": "Full-width back-green band with the app name and a hatched lower edge.",
+      "html": "<header class=\"ds-masthead\"><h1>Finance Manager</h1><p>Practice app: use made-up data only.</p></header>",
+      "css": ":host{--paper:#e9eee6;--sheet:#f8faf5;--field:#ffffff;--ink:#17201b;--ink-muted:#4c5850;--rule:#c3cdc2;--field-border:#84928a;--green:#1e4a34;--green-dark:#143426;--on-green:#eef4ee;--on-green-muted:#b9d0c0;--income:#1b6a42;--income-soft:#dcebdf;--expense:#ad2219;--expense-soft:#f6e2df;--figures:'Bodoni Moda','Palatino Linotype',Palatino,Georgia,serif;} .ds-masthead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0.25rem 1.5rem;padding:1rem;color:var(--on-green);background:var(--green) padding-box;border-bottom:6px solid transparent;border-image:repeating-linear-gradient(-45deg,var(--green) 0 1.5px,transparent 1.5px 4px) 6;} .ds-masthead h1{margin:0;font:600 1.5rem var(--figures);letter-spacing:0.03em;text-transform:uppercase;} .ds-masthead p{margin:0;font:0.875rem system-ui,sans-serif;color:var(--on-green-muted);}"
+    },
+    {
+      "name": "Totals Plate",
+      "kind": "card",
+      "refersTo": "totals-plate",
+      "description": "The only framed object: income − expenses = balance inside a double ink frame.",
+      "html": "<section class=\"ds-plate\"><p class=\"ds-month\">Totals for October 2026</p><dl><div><dt>Income</dt><dd class=\"ds-amt ds-in\">+$2,550.00</dd></div><div><dt>Expenses</dt><dd class=\"ds-amt ds-out\">−$2,752.82</dd></div><div><dt>Balance</dt><dd class=\"ds-amt ds-bal ds-out\">−$202.82</dd></div></dl></section>",
+      "css": ":host{--paper:#e9eee6;--sheet:#f8faf5;--field:#ffffff;--ink:#17201b;--ink-muted:#4c5850;--rule:#c3cdc2;--field-border:#84928a;--green:#1e4a34;--green-dark:#143426;--on-green:#eef4ee;--on-green-muted:#b9d0c0;--income:#1b6a42;--income-soft:#dcebdf;--expense:#ad2219;--expense-soft:#f6e2df;--figures:'Bodoni Moda','Palatino Linotype',Palatino,Georgia,serif;} .ds-amt{font-family:var(--figures);font-weight:700;font-variant-numeric:lining-nums tabular-nums;font-variation-settings:'opsz' 6;} .ds-in{color:var(--income);} .ds-out{color:var(--expense);} .ds-plate{background:var(--sheet);border:3px double var(--ink);padding:1rem 1.25rem;color:var(--ink);font-family:system-ui,sans-serif;} .ds-month{margin:0 0 0.5rem;font-size:0.875rem;color:var(--ink-muted);} .ds-plate dl{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;column-gap:2.5rem;margin:0;} .ds-plate div{display:grid;align-content:end;} .ds-plate dt{font-size:0.875rem;font-weight:600;color:var(--ink-muted);} .ds-plate dd{margin:0;font-size:1.625rem;} .ds-plate .ds-bal{font-size:2.75rem;line-height:1.1;} .ds-bal::before{content:'= ';color:var(--ink-muted);}"
+    },
+    {
+      "name": "Ruled Section",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "A work area: no box, just a 3px double ink rule on top and hairline-separated rows.",
+      "html": "<section class=\"ds-panel\"><h2>Transactions</h2><ul><li><span><b>Food</b><br><span class=\"ds-desc\">Sample lunch</span></span><span class=\"ds-r\"><span class=\"ds-amt ds-out\">−$23.50</span><br><time>Oct 3, 2026</time></span></li><li><span><b>Salary</b><br><span class=\"ds-desc\">Sample paycheck</span></span><span class=\"ds-r\"><span class=\"ds-amt ds-in\">+$2,400.00</span><br><time>Oct 1, 2026</time></span></li></ul></section>",
+      "css": ":host{--paper:#e9eee6;--sheet:#f8faf5;--field:#ffffff;--ink:#17201b;--ink-muted:#4c5850;--rule:#c3cdc2;--field-border:#84928a;--green:#1e4a34;--green-dark:#143426;--on-green:#eef4ee;--on-green-muted:#b9d0c0;--income:#1b6a42;--income-soft:#dcebdf;--expense:#ad2219;--expense-soft:#f6e2df;--figures:'Bodoni Moda','Palatino Linotype',Palatino,Georgia,serif;} .ds-amt{font-family:var(--figures);font-weight:700;font-variant-numeric:lining-nums tabular-nums;font-variation-settings:'opsz' 6;} .ds-in{color:var(--income);} .ds-out{color:var(--expense);} .ds-panel{border-top:3px double var(--ink);padding-top:0.75rem;width:28rem;background:var(--paper);color:var(--ink);font:1rem/1.5 system-ui,sans-serif;} .ds-panel h2{margin:0 0 1rem;font:600 1.375rem/1.2 var(--figures);} .ds-panel ul{list-style:none;margin:0;padding:0;} .ds-panel li{display:flex;justify-content:space-between;gap:1rem;padding:0.75rem 0;border-top:1px solid var(--rule);} .ds-panel li:first-child{border-top:0;padding-top:0;} .ds-desc{color:var(--ink-muted);} .ds-r{text-align:right;} .ds-panel .ds-amt{font-size:1.125rem;} .ds-panel time{font-size:0.875rem;color:var(--ink-muted);}"
+    },
+    {
+      "name": "Budget Meter",
+      "kind": "custom",
+      "refersTo": "stamp-over",
+      "description": "Engraved-line progress bar; over budget turns red and stamps itself.",
+      "html": "<div class=\"ds-budget\"><p class=\"ds-status\">$87.68 of $120.00 <span>$32.32 left</span></p><div class=\"ds-meter\"><div style=\"width:73%\"></div></div><p class=\"ds-status\">$129.00 of $100.00 <strong class=\"ds-over\">Over by $29.00</strong></p><div class=\"ds-meter ds-meter-over\"><div style=\"width:100%\"></div></div></div>",
+      "css": ":host{--paper:#e9eee6;--sheet:#f8faf5;--field:#ffffff;--ink:#17201b;--ink-muted:#4c5850;--rule:#c3cdc2;--field-border:#84928a;--green:#1e4a34;--green-dark:#143426;--on-green:#eef4ee;--on-green-muted:#b9d0c0;--income:#1b6a42;--income-soft:#dcebdf;--expense:#ad2219;--expense-soft:#f6e2df;--figures:'Bodoni Moda','Palatino Linotype',Palatino,Georgia,serif;} .ds-budget{width:22rem;font-family:system-ui,sans-serif;} .ds-status{display:flex;justify-content:space-between;align-items:baseline;margin:0.375rem 0 0;font-size:0.875rem;color:var(--ink-muted);font-variant-numeric:tabular-nums;} .ds-over{color:var(--expense);border:1.5px solid var(--expense);border-radius:2px;padding:0 0.375rem;font-size:0.75rem;letter-spacing:0.06em;text-transform:uppercase;} .ds-meter{height:8px;margin-top:0.375rem;border:1px solid var(--rule);background:var(--field);} .ds-meter div{height:100%;background:repeating-linear-gradient(-45deg, var(--green) 0 1.5px, transparent 1.5px 3.5px);box-shadow:inset -1.5px 0 var(--green);transform-origin:left;animation:ds-engrave 700ms cubic-bezier(0.16,1,0.3,1);} .ds-meter-over div{background:repeating-linear-gradient(-45deg,var(--expense) 0 2px,transparent 2px 3px);box-shadow:none;} @keyframes ds-engrave{from{transform:scaleX(0);}} @media (prefers-reduced-motion:reduce){.ds-meter div{animation:none;}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Engraved Note",
+    "overview": "The money screen is drawn like a US banknote. The page is pale currency paper, the text is green-black engraving ink, and the top of the screen is a band of the green you see on the back of a dollar. Money figures are set the way a note sets its value: in a high-contrast serif (Bodoni Moda), heavy and exact. Income uses the green of the Treasury seal; expenses use the red of the old United States Note seal.\n\nNothing floats. There are no shadows, no soft white cards, and no rounded bubbles. Sections sit straight on the paper, each one headed by a double ink line, the way printed notes rule off their parts. Fills are drawn as fine diagonal lines, like an engraver's shading, instead of flat blocks of colour. Only one object on the page has a full frame: the totals plate, which reads as a written sum (income − expenses = balance).\n\nThe screen is light only. It is used in two places: on a phone in daylight right after spending, and at a desk during a weekly review. Both are bright settings, so there is no dark mode yet.",
+    "keyCharacteristics": [
+      "Pale green-grey paper ground, never cream or white.",
+      "Bodoni Moda for headings and every money figure; the system sans-serif for controls and everyday text.",
+      "Green means income, red means expense or over budget. Nothing else on the page is red.",
+      "Double ink rules and hairlines instead of boxes and shadows.",
+      "Fine diagonal line \"engraving\" as the only fill pattern.",
+      "Sharp 2px corners."
+    ],
+    "rules": [
+      {
+        "name": "The Red Means Money Out Rule",
+        "body": "Red is used only for expenses, a negative balance, errors, and over budget. Never use red for decoration, for a chart slice, or for a heading.",
+        "section": "colors"
+      },
+      {
+        "name": "The Chart Is Not Income Rule",
+        "body": "The chart never uses red, because red already means \"expense\" and \"over budget\". Green in the chart means a category, not income. Income is shown only by the \"+\" sign and the income colour on figures.",
+        "section": "colors"
+      },
+      {
+        "name": "The Small-Print Figures Rule",
+        "body": "Every money figure uses Bodoni Moda at optical size 6 (`font-variation-settings: 'opsz' 6`), at every size, including the big balance. Bodoni's display cut has hairline-thin strokes: a \"4\" can look like a \"1\", and the \"+\" and \"−\" signs almost disappear. A trial at optical size 28 turned a negative balance's red \"−\" into a near-invisible line. Money must be exact and its direction unmistakable, so figures always use the sturdy small-text cut.",
+        "section": "typography"
+      },
+      {
+        "name": "The Column Rule",
+        "body": "Money figures use lining, equal-width digits (`font-variant-numeric: lining-nums tabular-nums`) so amounts line up in a column.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sign Rule",
+        "body": "Income shows a \"+\" and expenses show a real minus sign \"−\" (not a hyphen). Zero has no sign.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ruled, Not Boxed Rule",
+        "body": "Work areas are unboxed sections on the paper, each headed by a 3px double ink rule. The totals plate is the only fully framed object. Don't add cards, panels with backgrounds, or shadows around sections.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Engraved Fill Rule",
+        "body": "When something needs a fill (meter bars, the masthead's lower edge), draw it as fine diagonal lines at −45°, not a flat block of colour.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One Motion Rule",
+        "body": "The meters \"engrave\" in from left to right on load (`scaleX` from 0, 700ms, `cubic-bezier(0.16, 1, 0.3, 1)`). This is the page's only animation, and it is turned off when the device asks for reduced motion.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "**Do** set every money figure in Bodoni Moda at `'opsz' 6`, bold, with lining, equal-width digits.",
+      "**Do** show income with \"+\" in Treasury Seal Green and expenses with \"−\" in Note Seal Red.",
+      "**Do** head every new section with a 3px double ink rule and let it sit on the paper.",
+      "**Do** draw fills as fine diagonal lines (−45°) in green, or in red for over budget.",
+      "**Do** keep corners at 2px and inputs and buttons at 1rem text or larger.",
+      "**Do** use the 2px green focus outline on every interactive element.",
+      "**Do** keep colours in the `:root` list in `frontend/src/index.css`, so they are easy to change in one place."
+    ],
+    "donts": [
+      "**Don't** use Bodoni's display cut (a higher optical size) for money, even for the big balance; it hides the \"−\" sign.",
+      "**Don't** use red in the chart or anywhere outside expenses, errors, and over budget.",
+      "**Don't** treat green in the chart as income; it only marks a category.",
+      "**Don't** add drop shadows, soft white cards, or rounded corners larger than 2px.",
+      "**Don't** frame a second object like the totals plate; it stays the only framed one.",
+      "**Don't** add a second animation, and never animate without a reduced-motion fallback.",
+      "**Don't** use a cream or plain white page ground; the paper is green-grey.",
+      "**Don't** add a dark mode without first deciding where it would be used; the current use scenes are both bright."
+    ]
+  }
+}

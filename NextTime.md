@@ -3,16 +3,15 @@
 Handoff notes for the next Claude Code session. Read this first, then
 `README.md`, `BOSS.md`, `TASKS.md`, and `PRODUCT.md`.
 
-Last updated: 2026-10-05
+Last updated: 2026-10-06
 
 ## Where we are
 
-- Tasks 1–11 are merged (PRs #1–#11). Task 12 (monthly budgets) is on branch
-  `feature/monthly-budgets`, pushed; the developer opens and merges the PR.
-  **Check that it is merged before starting** (after `git fetch`, run
-  `git merge-base --is-ancestor <branch> origin/master`).
-- All originally planned features are done. Next is Task 13, the visual
-  identity round (planned for after Task 12, by the developer's choice).
+- Tasks 1–12 are merged (PRs #1–#12). All originally planned features are
+  done.
+- Task 13 (visual identity) is done and waiting for its PR; see below.
+- When a PR is reported merged, verify before building on it: after
+  `git fetch`, run `git merge-base --is-ancestor <branch> origin/master`.
 - Backend endpoints: `/health`; `POST`/`GET /transactions`;
   `GET /summary` (optional `?month=YYYY-MM`, otherwise all time);
   `GET /summary/categories?month=`; `GET /budgets?month=` (every expense
@@ -32,21 +31,24 @@ Last updated: 2026-10-05
 - Running the app needs both servers (see `README.md`). A manual run creates
   `backend/finance.db`; delete it to start empty.
 
-## Start here: Task 13, visual identity
+## Start here: Task 13 is in review
 
-1. Confirm Task 12 is merged, then sync `master` and create
-   `feature/visual-identity`.
-2. Run `/impeccable` (load its `context` first). There is no `DESIGN.md` yet,
-   so this is a new visual world: follow its new-work flow (direction round
-   with the developer, then build, finish review, and `DESIGN.md` by its
-   documenter). Keep `PRODUCT.md`'s principles: logging takes seconds, exact
-   numbers, income vs. expense unmistakable, phone and desktop.
-3. Known layout issues to solve in the redesign: the Budgets panel (8 rows)
-   pushes the Transactions list far down, especially on phones; the page is
-   one long column of panels.
-4. Scope check with the developer first: `BOSS.md` wins over Impeccable on
-   scope and code complexity (plain CSS, no new dependencies unless agreed).
-   Present the plan (files, decisions) and wait for approval.
+Task 13 (visual identity) is committed and pushed on `feature/visual-identity`;
+the PR still needs to be opened (link from `git push`) and merged by the
+developer. After the merge, verify with `git merge-base --is-ancestor`.
+
+- The look is "banknote engraving", recorded in `DESIGN.md` (read it before any
+  UI change) and `.impeccable/design.json`. The direction contract lives in
+  `.impeccable/surfaces/frontend-src-app-jsx.md`.
+- The developer asked for this round to run unattended, so there was no
+  direction round. If they want a different look, re-run Impeccable's
+  new-work flow with them.
+- Money figures use the self-hosted Bodoni Moda (`frontend/public/fonts/`) at
+  `'opsz' 6` at every size; the display cut hides a negative balance's "−".
+- Layout: phone is one column (totals, form, transactions, month); 768px+ has
+  the form beside transactions; 1100px+ has three columns. The form's Category
+  and Date share a row.
+- Impeccable's finish reviewer scored all fixes resolved (disposition: ship).
 
 Small follow-ups found in reviews (not done yet):
 - The amount `.5` is rejected (must type `0.5`); the backend would accept it.
@@ -102,6 +104,11 @@ errors are 422 responses with FastAPI's `detail` list.
   `git branch -d`.
 - Impeccable's folder is allowed in `.claude/settings.local.json`. Its
   `context` command must be run once per session before design work.
+- Node is not on the Bash/PowerShell PATH in Claude sessions: prefix
+  PowerShell commands with `$env:Path = "C:\Program Files\nodejs;$env:Path"`.
+- Screenshots at true phone width (390px): drive Edge over the DevTools
+  protocol (`Emulation.setDeviceMetricsOverride`) from a small Node script;
+  the iframe trick below loses API data.
 - Screenshots: headless Edge (`msedge --headless=new --screenshot`) can't go
   narrower than 504px. For a 390px phone view, load the app in a 390px-wide
   `<iframe>` and add `--virtual-time-budget=5000` (use `vite preview`, not

@@ -86,9 +86,10 @@ Undecided:
 
 ## Brand Commitments
 
-The name is "Finance Manager". There is no logo, voice guide, or other brand
-asset yet. The favicon in `frontend/public/` is the Vite default, not a brand
-asset.
+The name is "Finance Manager". The visual identity (banknote engraving) is
+recorded in `DESIGN.md`. The favicon in `frontend/public/favicon.svg` is a
+small authored mark: a green note with an engraved frame and an "F". There is
+no voice guide.
 
 ## Evidence on Hand
 

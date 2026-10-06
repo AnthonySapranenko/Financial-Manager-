@@ -58,7 +58,7 @@ function TransactionList({ transactions, loading, error }) {
   }
 
   return (
-    <section className="panel" aria-labelledby="transactions-heading">
+    <section className="panel transactions" aria-labelledby="transactions-heading">
       <h2 id="transactions-heading">Transactions</h2>
       {content}
     </section>

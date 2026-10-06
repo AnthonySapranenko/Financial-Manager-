@@ -122,21 +122,34 @@ function TransactionForm({ onAdd }) {
         </p>
       )}
 
-      <label className="field">
-        Category
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          required
-        >
-          <option value="">Choose a category</option>
-          {CATEGORIES.map((name) => (
-            <option key={name} value={name}>
-              {name[0].toUpperCase() + name.slice(1)}
-            </option>
-          ))}
-        </select>
-      </label>
+      {/* Two short fields side by side, so the form fits on a phone screen. */}
+      <div className="field-row">
+        <label className="field">
+          Category
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+          >
+            <option value="">Choose…</option>
+            {CATEGORIES.map((name) => (
+              <option key={name} value={name}>
+                {name[0].toUpperCase() + name.slice(1)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="field">
+          Date
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+        </label>
+      </div>
 
       <label className="field">
         Description (optional)
@@ -145,16 +158,6 @@ function TransactionForm({ onAdd }) {
           maxLength={200}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-        />
-      </label>
-
-      <label className="field">
-        Date
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
         />
       </label>
 

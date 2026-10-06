@@ -17,11 +17,15 @@ Later tasks are a proposed order and may change.
 9. **Connect frontend to backend**: Vite proxy `/api` -> FastAPI, `src/api.js`, loading/error states (PR #9)
 10. **Dashboard**: all-time income, expenses, and balance strip from `GET /summary`, refreshed after each add (PR #10)
 11. **Spending by category**: `GET /summary/categories?month=YYYY-MM` + this month's donut chart and legend (PR #11)
-12. **Monthly budgets**: standing budget per expense category (`/budgets` GET/PUT/DELETE), budget vs. spending meters; totals strip switched to this month
+12. **Monthly budgets**: standing budget per expense category (`/budgets` GET/PUT/DELETE), budget vs. spending meters; totals strip switched to this month (PR #12)
+
+## In review
+
+13. **Visual identity**: banknote-engraving look (`DESIGN.md`), self-hosted Bodoni Moda for money figures, three-column desktop / phone-first layout, unboxed sections (PR pending, branch `feature/visual-identity`)
 
 ## Planned
 
-13. Visual identity: Impeccable visual-direction round, restyle the page, `DESIGN.md`
+Nothing yet. Candidates: the small follow-ups listed in `NextTime.md`.
 
 ## Agreed decisions
 
