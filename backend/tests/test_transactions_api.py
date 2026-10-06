@@ -42,6 +42,14 @@ def test_whole_dollar_amount_returns_two_decimal_places(client):
     assert response.json()["amount"] == "20.00"
 
 
+def test_amount_without_leading_zero_is_accepted(client):
+    # The frontend sends what the user typed, so ".5" must work like "0.5".
+    response = post_transaction(client, amount=".5")
+
+    assert response.status_code == 201
+    assert response.json()["amount"] == "0.50"
+
+
 def test_list_transactions_is_empty_at_start(client):
     response = client.get("/transactions")
 

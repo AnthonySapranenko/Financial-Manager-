@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AMOUNT_ERROR, isValidAmount } from './money.js'
 
 // The fixed list from the backend (see TASKS.md "Agreed decisions").
 const CATEGORIES = [
@@ -12,10 +13,6 @@ const CATEGORIES = [
   'shopping',
   'other',
 ]
-
-// Digits, optionally followed by a dot and 1 or 2 digits: "12", "12.5", "12.34".
-// Same rule as the backend, so we never send it something it would reject.
-const AMOUNT_PATTERN = /^\d+(\.\d{1,2})?$/
 
 // Today as "YYYY-MM-DD" in the user's own time zone. (new Date().toISOString()
 // uses UTC, which is already tomorrow on a US evening.)
@@ -42,9 +39,8 @@ function TransactionForm({ onAdd }) {
     event.preventDefault() // stop the browser from reloading the page
 
     const trimmed = amount.trim()
-    // Compare as a string pattern, then check > 0. No money math happens here.
-    if (!AMOUNT_PATTERN.test(trimmed) || Number(trimmed) === 0) {
-      setError('Enter an amount greater than 0, with at most 2 decimals.')
+    if (!isValidAmount(trimmed)) {
+      setError(AMOUNT_ERROR)
       return
     }
     setError('')

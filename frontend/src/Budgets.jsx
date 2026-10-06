@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { monthName } from './dates.js'
-import { formatMoney } from './money.js'
+import { AMOUNT_ERROR, formatMoney, isValidAmount } from './money.js'
 
 function capitalize(word) {
   return word[0].toUpperCase() + word.slice(1)
@@ -17,10 +17,16 @@ function BudgetRow({ status, onSave }) {
 
   async function handleSubmit(event) {
     event.preventDefault()
+    const trimmed = value.trim()
+    // Empty is allowed: it means "remove this budget".
+    if (trimmed !== '' && !isValidAmount(trimmed)) {
+      setError(AMOUNT_ERROR)
+      return
+    }
     setSaving(true)
     setError('')
     try {
-      await onSave(status.category, value.trim())
+      await onSave(status.category, trimmed)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -62,6 +68,8 @@ function BudgetRow({ status, onSave }) {
         <label htmlFor={`budget-${status.category}`}>{name}</label>
         <input
           id={`budget-${status.category}`}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={error ? `budget-${status.category}-error` : undefined}
           type="text"
           inputMode="decimal"
           placeholder="No budget"
@@ -74,7 +82,7 @@ function BudgetRow({ status, onSave }) {
       </form>
       {progress}
       {error && (
-        <p className="form-error" role="alert">
+        <p id={`budget-${status.category}-error`} className="form-error" role="alert">
           {error}
         </p>
       )}
