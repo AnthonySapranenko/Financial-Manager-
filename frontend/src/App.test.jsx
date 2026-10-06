@@ -114,6 +114,7 @@ function spendingPanel() {
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  vi.useRealTimers() // undo any test that froze the clock
 })
 
 // Fills in the form the way a user would, then clicks the button.
@@ -180,14 +181,13 @@ test('shows an error when the backend is unreachable', async () => {
 })
 
 test('date defaults to today', async () => {
+  // Freeze the clock (only Date, so timers and promises still work). Without
+  // this, a run that crosses midnight would compare two different "todays".
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 2, 15, 23, 59)) // March 15, 11:59 pm local
   render(<App />)
 
-  const now = new Date()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
-  expect(screen.getByLabelText('Date')).toHaveValue(
-    `${now.getFullYear()}-${month}-${day}`,
-  )
+  expect(screen.getByLabelText('Date')).toHaveValue('2026-03-15')
   await listItems()
 })
 
@@ -263,7 +263,31 @@ test('shows the API error and keeps the form filled when saving fails', async ()
   expect(screen.getByRole('button', { name: 'Add transaction' })).toBeEnabled()
 })
 
-test.each(['0', '12.345', 'abc'])('rejects amount %s without calling the API', async (amount) => {
+test('accepts an amount without a leading zero, like .5', async () => {
+  render(<App />)
+  await listItems()
+  fetch.mockResolvedValueOnce(
+    respond(
+      {
+        id: 3,
+        amount: '0.50',
+        type: 'expense',
+        category: 'food',
+        description: '',
+        transaction_date: '2026-10-05',
+      },
+      201,
+    ),
+  )
+
+  addTransaction({ amount: '.5', type: 'Expense', category: 'food' })
+
+  await waitFor(async () => expect(await listItems()).toHaveLength(3))
+  expect(JSON.parse(postCall()[1].body).amount).toBe('.5')
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+})
+
+test.each(['0', '.0', '.', '12.345', '.123', 'abc'])('rejects amount %s without calling the API', async (amount) => {
   render(<App />)
   await listItems()
 
@@ -465,6 +489,23 @@ test('saving an empty box removes the budget', async () => {
   ).toBeInTheDocument()
   expect(callWith('DELETE')[0]).toBe('/api/budgets/food')
 })
+
+test.each(['-5', '0', 'abc', '12.345'])(
+  'rejects budget %s in the browser without calling the API',
+  async (amount) => {
+    render(<App />)
+    await within(budgetsPanel()).findAllByRole('listitem')
+
+    fireEvent.change(screen.getByLabelText('Food'), { target: { value: amount } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save Food budget' }))
+
+    expect(within(budgetsPanel()).getByRole('alert')).toHaveTextContent(
+      'Enter an amount greater than 0, with at most 2 decimals.',
+    )
+    expect(screen.getByLabelText('Food')).toHaveAttribute('aria-invalid', 'true')
+    expect(callWith('PUT')).toBeUndefined()
+  },
+)
 
 test("shows the backend's message when a budget is refused", async () => {
   render(<App />)

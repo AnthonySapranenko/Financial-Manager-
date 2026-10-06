@@ -412,7 +412,8 @@ button {
   color: #6b766f; /* 4.6:1 on white */
 }
 
-.field input[aria-invalid='true'] {
+.field input[aria-invalid='true'],
+.budget-form input[aria-invalid='true'] {
   border-color: var(--expense);
 }
 

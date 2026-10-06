@@ -19,13 +19,15 @@ Later tasks are a proposed order and may change.
 11. **Spending by category**: `GET /summary/categories?month=YYYY-MM` + this month's donut chart and legend (PR #11)
 12. **Monthly budgets**: standing budget per expense category (`/budgets` GET/PUT/DELETE), budget vs. spending meters; totals strip switched to this month (PR #12)
 
+13. **Visual identity**: banknote-engraving look (`DESIGN.md`), self-hosted Bodoni Moda for money figures, three-column desktop / phone-first layout, unboxed sections (PR #13)
+
 ## In review
 
-13. **Visual identity**: banknote-engraving look (`DESIGN.md`), self-hosted Bodoni Moda for money figures, three-column desktop / phone-first layout, unboxed sections (PR pending, branch `feature/visual-identity`)
+14. **Amount input polish**: `.5` accepted, budget amounts checked in the browser, midnight-proof date test (branch `feature/amount-polish`)
 
 ## Planned
 
-Nothing yet. Candidates: the small follow-ups listed in `NextTime.md`.
+Nothing yet. Candidates: the remaining follow-ups in `NextTime.md`, or editing/deleting transactions (undecided in `PRODUCT.md`).
 
 ## Agreed decisions
 
