@@ -93,6 +93,16 @@ def list_transactions(session: Session = Depends(get_session)):
     return [TransactionRead.from_transaction(t) for t in transactions]
 
 
+@app.delete("/transactions/{transaction_id}", status_code=204)
+def delete_transaction(transaction_id: int, session: Session = Depends(get_session)):
+    """Delete a transaction. Deleting one that's already gone is fine, so a
+    double click or a second browser tab can't cause an error."""
+    transaction = session.get(Transaction, transaction_id)
+    if transaction is not None:
+        session.delete(transaction)
+        session.commit()
+
+
 @app.get("/summary", response_model=Summary)
 def get_summary(
     month: str | None = Query(default=None, pattern=MONTH_PATTERN),

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   clearBudget,
   createTransaction,
+  deleteTransaction,
   getBudgets,
   getCategorySpending,
   getSummary,
@@ -90,6 +91,15 @@ function App() {
     refreshMonth()
   }
 
+  // Delete first, then drop it from the list. If deleting fails, the error
+  // goes back to that transaction's row and the row stays.
+  async function removeTransaction(id) {
+    await deleteTransaction(id)
+    // filter makes a new array without that one transaction.
+    setTransactions((current) => current.filter((t) => t.id !== id))
+    refreshMonth()
+  }
+
   // An empty box means "no budget". Errors go back to that budget's row.
   async function saveBudget(category, amount) {
     if (amount === '') {
@@ -117,6 +127,7 @@ function App() {
             transactions={transactions}
             loading={loading}
             error={loadError}
+            onDelete={removeTransaction}
           />
           <div className="month">
             <CategorySpending
