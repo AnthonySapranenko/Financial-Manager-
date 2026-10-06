@@ -100,35 +100,40 @@ function App() {
     await refresh(() => getBudgets(month), setBudgets, setBudgetsError)
   }
 
+  // Order matters on phones, where everything is one column: logging first,
+  // then recent transactions, then the month's review. On wider screens,
+  // index.css places the same three blocks side by side.
   return (
-    <main>
-      <header>
+    <>
+      <header className="masthead">
         <h1>Finance Manager</h1>
-        <p className="note">Practice app: use made-up data only.</p>
+        <p>Practice app: use made-up data only.</p>
       </header>
-      <Summary month={month} summary={summary} error={summaryError} />
-      <div className="layout">
-        <TransactionForm onAdd={addTransaction} />
-        <div className="column">
-          <CategorySpending
-            month={month}
-            data={spending}
-            error={spendingError}
-          />
-          <Budgets
-            month={month}
-            budgets={budgets}
-            error={budgetsError}
-            onSave={saveBudget}
-          />
+      <main>
+        <Summary month={month} summary={summary} error={summaryError} />
+        <div className="layout">
+          <TransactionForm onAdd={addTransaction} />
           <TransactionList
             transactions={transactions}
             loading={loading}
             error={loadError}
           />
+          <div className="month">
+            <CategorySpending
+              month={month}
+              data={spending}
+              error={spendingError}
+            />
+            <Budgets
+              month={month}
+              budgets={budgets}
+              error={budgetsError}
+              onSave={saveBudget}
+            />
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   )
 }
 

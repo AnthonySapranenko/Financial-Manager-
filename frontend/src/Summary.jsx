@@ -37,7 +37,7 @@ function Summary({ month, summary, error }) {
         </div>
         <div>
           <dt>Balance</dt>
-          <dd className={negative ? 'amount expense' : 'amount'}>
+          <dd className={negative ? 'amount balance expense' : 'amount balance'}>
             {negative
               ? withSign('−', summary.balance.slice(1)) // drop the "-"
               : formatMoney(summary.balance)}
