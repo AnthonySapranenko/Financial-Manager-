@@ -120,8 +120,8 @@ When the Boss makes an important architectural or technical decision, it should 
 ## Project Status
 
 The backend API works: transactions can be saved, listed, and summarized.
-The React frontend can add and list transactions, shows all-time totals,
-and shows this month's spending by category as a donut chart.
+The React frontend can add and list transactions, and shows this month's
+totals, spending by category (donut chart), and budgets per category.
 
 See [TASKS.md](TASKS.md) for what is done and what comes next.
 
@@ -182,8 +182,11 @@ Other commands, also run from `frontend/`:
 | GET | `/health` | Check that the API is running |
 | POST | `/transactions` | Add an income or expense |
 | GET | `/transactions` | List all transactions, newest first |
-| GET | `/summary` | Total income, total expenses, and balance |
+| GET | `/summary` | Total income, total expenses, and balance (add `?month=YYYY-MM` for one month) |
 | GET | `/summary/categories?month=YYYY-MM` | One month's expenses per category (largest first) and their total |
+| GET | `/budgets?month=YYYY-MM` | Every expense category: budget (or `null`), spent, and remaining |
+| PUT | `/budgets/{category}` | Set or change a category's monthly budget. Body: `{"amount": 400}` |
+| DELETE | `/budgets/{category}` | Remove a category's budget |
 
 Amounts are sent and returned in dollars (for example `12.34`) and stored
 in the database as whole cents (`1234`) to avoid rounding errors.

@@ -108,3 +108,38 @@ class CategorySpending(SQLModel):
     month: str  # "YYYY-MM"
     total: Decimal
     categories: list[CategoryTotal]
+
+
+class Budget(SQLModel, table=True):
+    """A standing monthly budget. category is the primary key, so the database
+    itself allows only one budget per category."""
+
+    __tablename__ = "budgets"
+    __table_args__ = (CheckConstraint("amount_cents > 0", name="budget_positive"),)
+
+    category: Category = Field(primary_key=True)
+    amount_cents: int
+
+
+class BudgetSet(SQLModel):
+    """What a client sends to set a budget."""
+
+    amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
+
+
+class BudgetRead(SQLModel):
+    """A saved budget, in dollars."""
+
+    category: Category
+    amount: Decimal
+
+
+class BudgetStatus(SQLModel):
+    """One category's budget compared with what was spent in a month.
+    budget and remaining are None when the category has no budget;
+    remaining is negative when over budget."""
+
+    category: Category
+    budget: Decimal | None
+    spent: Decimal
+    remaining: Decimal | None

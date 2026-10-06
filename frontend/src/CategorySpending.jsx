@@ -1,3 +1,4 @@
+import { monthName } from './dates.js'
 import { formatMoney } from './money.js'
 
 // Slots 1-5 of a colorblind-checked chart palette, used largest slice first.
@@ -32,15 +33,6 @@ function toSlices(categories) {
     })
   }
   return slices
-}
-
-// "2026-10" -> "October 2026"
-function monthName(month) {
-  const [year, monthNumber] = month.split('-').map(Number)
-  return new Date(year, monthNumber - 1, 1).toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  })
 }
 
 // The donut is one circle per slice, drawn as a dashed outline. pathLength=100

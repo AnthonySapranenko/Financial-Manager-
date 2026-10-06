@@ -48,3 +48,35 @@ def test_summary_has_no_floating_point_errors(client):
     add(client, 0.20, "income")
 
     assert client.get("/summary").json()["total_income"] == "0.30"
+
+
+def add_on(client, amount, type_, day):
+    response = client.post(
+        "/transactions",
+        json={
+            "amount": amount,
+            "type": type_,
+            "category": "other",
+            "transaction_date": day,
+        },
+    )
+    assert response.status_code == 201
+
+
+def test_summary_for_one_month(client):
+    add_on(client, 1000, "income", "2026-10-01")
+    add_on(client, 40, "expense", "2026-10-31")
+    add_on(client, 500, "income", "2026-09-30")  # other months: not counted
+    add_on(client, 7, "expense", "2026-11-01")
+
+    assert client.get("/summary", params={"month": "2026-10"}).json() == {
+        "total_income": "1000.00",
+        "total_expenses": "40.00",
+        "balance": "960.00",
+    }
+    # Without a month, it's still all time.
+    assert client.get("/summary").json()["balance"] == "1453.00"
+
+
+def test_summary_rejects_a_bad_month(client):
+    assert client.get("/summary", params={"month": "2026-13"}).status_code == 422

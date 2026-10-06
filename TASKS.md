@@ -16,11 +16,12 @@ Later tasks are a proposed order and may change.
 8. **Transaction form and list**: one-page UI with sample data in React state (PR #8)
 9. **Connect frontend to backend**: Vite proxy `/api` -> FastAPI, `src/api.js`, loading/error states (PR #9)
 10. **Dashboard**: all-time income, expenses, and balance strip from `GET /summary`, refreshed after each add (PR #10)
-11. **Spending by category**: `GET /summary/categories?month=YYYY-MM` + this month's donut chart and legend
+11. **Spending by category**: `GET /summary/categories?month=YYYY-MM` + this month's donut chart and legend (PR #11)
+12. **Monthly budgets**: standing budget per expense category (`/budgets` GET/PUT/DELETE), budget vs. spending meters; totals strip switched to this month
 
 ## Planned
 
-12. Monthly budgets (one per category)
+13. Visual identity: Impeccable visual-direction round, restyle the page, `DESIGN.md`
 
 ## Agreed decisions
 

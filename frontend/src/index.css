@@ -318,6 +318,103 @@ button[type='submit']:disabled {
   font-variant-numeric: tabular-nums;
 }
 
+/* ---- Budgets ---- */
+
+.summary-month {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.budget-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.budget {
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.budget:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.budget-form {
+  display: grid;
+  grid-template-columns: 1fr 7.5rem auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.budget-form label {
+  font-weight: 600;
+}
+
+.budget-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.budget-form button {
+  padding: 0.375rem 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.budget-form button:hover {
+  border-color: var(--accent);
+}
+
+.budget-form button:disabled {
+  color: var(--text-muted);
+  cursor: wait;
+}
+
+.budget-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.375rem 0 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.budget-status .over {
+  color: var(--expense);
+}
+
+/* The bar: a gray track with a filled part whose width is spent / budget. */
+.meter {
+  height: 6px;
+  margin-top: 0.375rem;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.meter div {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.meter.over div {
+  background: var(--expense);
+}
+
 /* ---- List ---- */
 
 .empty {

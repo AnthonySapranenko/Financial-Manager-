@@ -7,65 +7,59 @@ Last updated: 2026-10-05
 
 ## Where we are
 
-- Tasks 1–10 are merged (PRs #1–#10). Task 11 (spending by category) is on
-  branch `feature/category-spending`, pushed; the developer opens and merges
-  the PR. **Check that it is merged before starting Task 12** (last time the
-  developer said "merged" before the merge had happened: verify with
-  `git merge-base --is-ancestor <branch> origin/master` after fetching).
-- Backend endpoints: `/health`, `POST`/`GET /transactions`, `GET /summary`
-  (all-time totals), `GET /summary/categories?month=YYYY-MM` (one month's
-  expenses per category, largest first, plus `total`; month validated by a
-  `Query(pattern=...)`; date range is `>= 1st` and `< next month's 1st`).
-- Frontend structure (`frontend/src/`):
-  - `api.js`: every `fetch`; `/api/...` is proxied by Vite to
-    `http://127.0.0.1:8000`.
-  - `money.js`: `formatMoney()`. The browser never does real money math;
-    totals come from the backend (the donut's "N more categories" slice is
-    grouped in whole cents for display only).
-  - `App.jsx`: owns state; loads list, summary, and this month's spending
-    independently (each has its own error); refreshes summary and spending
-    after each add.
-  - `Summary.jsx` (all-time totals strip), `CategorySpending.jsx` (hand-written
-    SVG donut via `stroke-dasharray`, max 6 slices: top 5 + gray folded
-    slice, legend with amount and percent), `TransactionForm.jsx`,
-    `TransactionList.jsx`.
-- Chart colors: slots 1–5 of the dataviz skill's palette, validated with its
-  `validate_palette.js` (passes; contrast WARN relieved by the legend). The
-  developer allowed running that validator.
-- Design: plain styling. The visual-identity round is planned for **after
-  Task 12** (developer's choice).
-- Tests: 44 backend (pytest) and 18 frontend (Vitest), all passing.
+- Tasks 1–11 are merged (PRs #1–#11). Task 12 (monthly budgets) is on branch
+  `feature/monthly-budgets`, pushed; the developer opens and merges the PR.
+  **Check that it is merged before starting** (after `git fetch`, run
+  `git merge-base --is-ancestor <branch> origin/master`).
+- All originally planned features are done. Next is Task 13, the visual
+  identity round (planned for after Task 12, by the developer's choice).
+- Backend endpoints: `/health`; `POST`/`GET /transactions`;
+  `GET /summary` (optional `?month=YYYY-MM`, otherwise all time);
+  `GET /summary/categories?month=`; `GET /budgets?month=` (every expense
+  category with `budget` or null, `spent`, `remaining`, negative when over);
+  `PUT /budgets/{category}` (upsert, salary rejected with a plain-text 422);
+  `DELETE /budgets/{category}` (204). Helpers in `main.py`: `month_range()`,
+  `spending_by_category()`. Tables: `transactions`, `budgets` (category is the
+  primary key).
+- Frontend (`frontend/src/`): `api.js` (all fetches; handles 204 and
+  plain-text 422), `dates.js` (`currentMonth`, `monthName`), `money.js`
+  (`formatMoney`), `App.jsx` (state; `refresh()` helper, `refreshMonth()`
+  reloads totals, spending, and budgets after each add), `Summary.jsx`
+  (this month's totals strip), `CategorySpending.jsx` (SVG donut + legend),
+  `Budgets.jsx` (one form per category row, meter bar, "Over by" in red
+  bold), `TransactionForm.jsx`, `TransactionList.jsx`.
+- Tests: 54 backend (pytest) and 23 frontend (Vitest), all passing.
 - Running the app needs both servers (see `README.md`). A manual run creates
   `backend/finance.db`; delete it to start empty.
 
-## Start here: Task 12, monthly budgets (one per category)
+## Start here: Task 13, visual identity
 
-1. Confirm Task 11 is merged, then sync `master` and create
-   `feature/monthly-budgets`.
-2. Plan with the developer. Agreed earlier: one monthly budget per category.
-   Questions to settle:
-   - Data model: a `Budget` table (category, amount in cents). Same budget
-     every month, or per month? (Simplest: one standing amount per category.)
-   - Endpoints, e.g. `GET /budgets`, `PUT /budgets/{category}`; tests.
-   - UI: set budgets, and compare with this month's spending from
-     `/summary/categories` (a meter per category; see the dataviz skill's
-     "meter" form; over-budget must be unmistakable and not color-only).
-   - The all-time totals strip vs. this-month donut mismatch (Task 11
-     review): consider showing this month's totals too.
-3. Present the plan (files, tests, decisions) and wait for approval.
-4. After Task 12: the visual-identity round (`/impeccable`, new-work flow,
-   `DESIGN.md`).
+1. Confirm Task 12 is merged, then sync `master` and create
+   `feature/visual-identity`.
+2. Run `/impeccable` (load its `context` first). There is no `DESIGN.md` yet,
+   so this is a new visual world: follow its new-work flow (direction round
+   with the developer, then build, finish review, and `DESIGN.md` by its
+   documenter). Keep `PRODUCT.md`'s principles: logging takes seconds, exact
+   numbers, income vs. expense unmistakable, phone and desktop.
+3. Known layout issues to solve in the redesign: the Budgets panel (8 rows)
+   pushes the Transactions list far down, especially on phones; the page is
+   one long column of panels.
+4. Scope check with the developer first: `BOSS.md` wins over Impeccable on
+   scope and code complexity (plain CSS, no new dependencies unless agreed).
+   Present the plan (files, decisions) and wait for approval.
 
 Small follow-ups found in reviews (not done yet):
 - The amount `.5` is rejected (must type `0.5`); the backend would accept it.
 - "Today" and "this month" are computed when the page loads, so they go
   stale past midnight.
 - The "date defaults to today" test could flake if it runs exactly at midnight.
-- `api.js` assumes a 422 `detail` is a list (true for FastAPI validation
-  errors; a plain-text `detail` would show a confusing message).
-- Two very fast adds could get summary responses out of order and briefly
-  show stale totals (practically impossible on localhost).
+- Two very fast adds could get responses out of order and briefly show
+  stale numbers (practically impossible on localhost).
 - Donut tooltips are mouse-only (the legend carries all values).
+- A budget row's input keeps its typed value if the budget changes elsewhere
+  (e.g. another tab) until reload.
+- Budget amounts aren't checked in the browser; the backend's 422 message
+  ("amount: Input should be greater than 0") is shown as is.
 
 ## How the developer wants to work
 
