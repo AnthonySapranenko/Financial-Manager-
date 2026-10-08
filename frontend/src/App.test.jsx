@@ -1,4 +1,5 @@
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -198,6 +199,47 @@ test('date defaults to today', async () => {
 
   expect(screen.getByLabelText('Date')).toHaveValue('2026-03-15')
   await listItems()
+})
+
+// Pretends the user comes back to the tab: the browser fires
+// "visibilitychange" on the document. act() lets React finish re-rendering.
+function comeBackToPage() {
+  act(() => {
+    document.dispatchEvent(new Event('visibilitychange'))
+  })
+}
+
+test('a page left open past midnight moves on to the new day and month', async () => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 9, 31, 23, 59)) // Oct 31, 11:59 pm local
+  render(<App />)
+  await listItems()
+  expect(within(totals()).getByText('Totals for October 2026')).toBeInTheDocument()
+
+  vi.setSystemTime(new Date(2026, 10, 1, 7, 30)) // the next morning
+  comeBackToPage()
+
+  expect(screen.getByLabelText('Date')).toHaveValue('2026-11-01')
+  expect(within(totals()).getByText('Totals for November 2026')).toBeInTheDocument()
+  // The new month's numbers are fetched, not just the label changed.
+  expect(fetch).toHaveBeenCalledWith('/api/summary?month=2026-11', undefined)
+  expect(fetch).toHaveBeenCalledWith('/api/summary/categories?month=2026-11', undefined)
+  expect(fetch).toHaveBeenCalledWith('/api/budgets?month=2026-11', undefined)
+})
+
+test('a date the user picked is kept past midnight', async () => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 9, 31, 23, 59))
+  render(<App />)
+  await listItems()
+  fireEvent.change(screen.getByLabelText('Date'), {
+    target: { value: '2026-10-15' },
+  })
+
+  vi.setSystemTime(new Date(2026, 10, 1, 7, 30))
+  comeBackToPage()
+
+  expect(screen.getByLabelText('Date')).toHaveValue('2026-10-15')
 })
 
 test('adding sends it to the API and shows the saved transaction', async () => {

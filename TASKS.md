@@ -22,13 +22,15 @@ Later tasks are a proposed order and may change.
 14. **Amount input polish**: `.5` accepted, budget amounts checked in the browser, midnight-proof date test (PR #14)
 15. **Delete a transaction**: `DELETE /transactions/{id}`, a confirm-then-delete button on each row, totals reload after (PR #15)
 
+16. **Focus after a delete**: keyboard focus moves to the Transactions heading instead of the page top (PR #16)
+
 ## In review
 
-16. **Focus after a delete**: keyboard focus moves to the Transactions heading instead of the page top (branch `feature/focus-after-delete`)
+17. **Stay current past midnight**: `useToday()` hook (checks every minute and when the tab comes back into view); the form's date and the month's numbers move on to the new day (branch `feature/stay-current-past-midnight`)
 
 ## Planned
 
-Nothing yet. Candidates: "today"/"this month" going stale past midnight (see `NextTime.md` follow-ups). Editing a transaction in place is still undecided in `PRODUCT.md`.
+Nothing yet. Editing a transaction in place is still undecided in `PRODUCT.md`.
 
 ## Agreed decisions
 
