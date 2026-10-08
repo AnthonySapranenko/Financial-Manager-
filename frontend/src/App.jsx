@@ -45,6 +45,9 @@ function App() {
   const [spendingError, setSpendingError] = useState('')
   const [budgets, setBudgets] = useState(null)
   const [budgetsError, setBudgetsError] = useState('')
+  // Totals across every month, for the all-time balance.
+  const [overall, setOverall] = useState(null)
+  const [overallError, setOverallError] = useState('')
 
   // Counts the changes that should reload the month's numbers. Bumping it
   // re-runs the effect below, so every reload goes through one place.
@@ -109,6 +112,9 @@ function App() {
     load(() => getSummary(month), setSummary, setSummaryError)
     load(() => getCategorySpending(month), setSpending, setSpendingError)
     load(() => getBudgets(month), setBudgets, setBudgetsError)
+    // Not about the month, but it changes whenever a transaction does, so
+    // it reloads here too (and gets the same protection from late answers).
+    load(() => getSummary(), setOverall, setOverallError)
 
     return () => {
       ignore = true
@@ -161,6 +167,8 @@ function App() {
           onMonthChange={showMonth}
           summary={summary}
           error={summaryError}
+          overall={overall}
+          overallError={overallError}
         />
         <div className="layout">
           <TransactionForm today={today} onAdd={addTransaction} />

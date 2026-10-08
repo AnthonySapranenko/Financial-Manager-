@@ -38,9 +38,10 @@ export function getTransactions() {
   return request('/transactions')
 }
 
-// month is "YYYY-MM" everywhere below.
+// month is "YYYY-MM" everywhere below. getSummary() with no month gives the
+// totals across all transactions.
 export function getSummary(month) {
-  return request(`/summary?month=${month}`)
+  return request(month ? `/summary?month=${month}` : '/summary')
 }
 
 export function getCategorySpending(month) {
