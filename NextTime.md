@@ -3,12 +3,12 @@
 Handoff notes for the next Claude Code session. Read this first, then
 `README.md`, `BOSS.md`, `TASKS.md`, and `PRODUCT.md`.
 
-Last updated: 2026-10-06 (Task 15)
+Last updated: 2026-10-07 (Task 16 in review)
 
 ## Where we are
 
-- Tasks 1–14 are merged (PRs #1–#14), including the visual identity
-  (`DESIGN.md`). Task 15 (delete a transaction) is in review; see below.
+- Tasks 1–15 are merged (PRs #1–#15). Task 16 (focus after a delete) is in
+  review on `feature/focus-after-delete`.
 - When a PR is reported merged, verify before building on it: after
   `git fetch`, run `git merge-base --is-ancestor <branch> origin/master`.
 - Backend endpoints: `/health`; `POST`/`GET /transactions`;
@@ -22,29 +22,41 @@ Last updated: 2026-10-06 (Task 15)
   primary key).
 - Frontend (`frontend/src/`): `api.js` (all fetches; handles 204 and
   plain-text 422), `dates.js` (`currentMonth`, `monthName`), `money.js`
-  (`formatMoney`, `isValidAmount`, `AMOUNT_ERROR`: the one amount rule used by
-  the transaction form and the budget rows), `App.jsx` (state; `refresh()` helper, `refreshMonth()`
-  reloads totals, spending, and budgets after each add), `Summary.jsx`
+  (`formatMoney`, `isValidAmount`, `AMOUNT_ERROR`: the one amount rule used
+  by the transaction form and the budget rows), `App.jsx` (state; `refresh()`
+  helper, `refreshMonth()` reloads totals, spending, and budgets after each
+  add or delete; `removeTransaction()`), `Summary.jsx`
   (this month's totals strip), `CategorySpending.jsx` (SVG donut + legend),
   `Budgets.jsx` (one form per category row, meter bar, "Over by" in red
   bold), `TransactionForm.jsx`, `TransactionList.jsx` (one `TransactionRow` per
-  transaction, with a confirm-then-delete button and its own error).
-- Tests: 59 backend (pytest) and 34 frontend (Vitest), all passing.
+  transaction, with a confirm-then-delete button and its own error; after a
+  successful delete, focus moves to the heading via `headingRef`).
+- Tests: 59 backend (pytest) and 36 frontend (Vitest), all passing.
 - Running the app needs both servers (see `README.md`). A manual run creates
   `backend/finance.db`; delete it to start empty.
 
-## Start here: Task 15 is in review
+## Start here: Task 16 is in review
 
-Task 15 (delete a transaction) is committed and pushed on
-`feature/delete-transaction`; the developer opens and merges the PR. Verify the
-merge with `git merge-base --is-ancestor` before building on it.
+Task 16 (keyboard focus after a delete) is on `feature/focus-after-delete`.
+Once the developer merges it (verify with `git merge-base --is-ancestor`),
+pick Task 17. Suggested: **"today" and "this month" go stale past midnight**
+(teaches the `visibilitychange` event or a timer, and re-fetching). Bigger
+option, still the developer's call (undecided in `PRODUCT.md`): editing a
+transaction in place.
 
-- The developer twice asked Claude to choose the next work, so Claude made the
-  PRODUCT.md call: deleting is in (smallest useful version), editing in place
-  is still undecided. Recorded in `PRODUCT.md`.
-- Each row has a quiet "Delete" on its date line; `window.confirm()` asks
-  first. After deleting, the month's totals, chart, and budgets reload.
-- Tests stub the question with `vi.spyOn(window, 'confirm')`.
+Recent tasks, for context:
+- Task 16: `TransactionList` wraps `onDelete`; after it resolves,
+  `headingRef.current.focus()`. The `<h2>` has `tabIndex={-1}` (focusable by
+  code, skipped by Tab). A failed delete throws first, so focus stays on the
+  button. The global `:focus-visible` ring shows only for keyboard users.
+- Task 15 (PR #15): delete a transaction. `DELETE /transactions/{id}` (204,
+  also when already gone); each row has a quiet "Delete" on its date line;
+  `window.confirm()` asks first; totals, chart, and budgets reload after.
+  Tests stub the question with `vi.spyOn(window, 'confirm')`. Claude made
+  the PRODUCT.md call (delete yes, edit undecided) because the developer
+  asked Claude to choose.
+- Task 14 (PR #14): `.5` accepted; budget amounts checked in the browser;
+  midnight-proof date test (`vi.useFakeTimers({ toFake: ['Date'] })`).
 
 Visual identity (Task 13, merged): read `DESIGN.md` before any UI change.
 Money figures use Bodoni Moda at `'opsz' 6` at every size (the display cut
@@ -53,9 +65,6 @@ unattended, so there was no direction round; if they want a different look,
 re-run Impeccable's new-work flow with them.
 
 Small follow-ups found in reviews (not done yet):
-- After deleting a transaction, keyboard focus falls back to the page top
-  (the row and its button are gone). Could move focus to the Transactions
-  heading (needs a ref and `tabIndex={-1}`).
 - "Today" and "this month" are computed when the page loads, so they go
   stale past midnight.
 - Two very fast adds could get responses out of order and briefly show
@@ -72,9 +81,16 @@ Small follow-ups found in reviews (not done yet):
   **review** (`BOSS.md` §7: always do it, report findings ranked by severity),
   explain the concepts, commit.
 - Before changing anything, state exactly which files will be created or
-  modified. Never start the next task without approval.
-- Commit and push only when asked. One feature branch and one PR per task.
-  The developer merges PRs on GitHub.
+  modified.
+- Since 2026-10-06 the developer often says "continue with the boss loop, do
+  not ask me": then pick the next task yourself, run the whole loop
+  (understand, plan, implement, test, review, fix, explain), commit and push
+  the feature branch, and give the PR link. Explain choices in the final
+  report instead of asking. Without that instruction, the default is still:
+  plan, wait for approval, and commit/push only when asked.
+- One feature branch and one PR per task, always from an up-to-date
+  `master`. Don't stack a new task on an unmerged branch: if the last PR
+  isn't merged, stop and say so. The developer merges PRs on GitHub.
 - The developer usually asks Claude to write the code, then wants a clear
   explanation and "try it yourself" steps.
 - Precedence: `BOSS.md` wins over the Ponytail plugin. Impeccable guides UI

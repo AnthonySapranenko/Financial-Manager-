@@ -548,6 +548,19 @@ test('deleting asks first, then removes the transaction and reloads totals', asy
   expect(summaryLoads()).toBeGreaterThan(loadsBefore)
 })
 
+test('after deleting, keyboard focus moves to the Transactions heading', async () => {
+  vi.spyOn(window, 'confirm').mockReturnValue(true)
+  render(<App />)
+  await listItems()
+  const button = deleteButton('−$64.18 food expense on Sep 28, 2026')
+  button.focus() // as if the user had tabbed to it
+
+  fireEvent.click(button)
+
+  const heading = screen.getByRole('heading', { name: 'Transactions' })
+  await waitFor(() => expect(heading).toHaveFocus())
+})
+
 test('cancelling the question deletes nothing', async () => {
   vi.spyOn(window, 'confirm').mockReturnValue(false) // the user clicks Cancel
   render(<App />)
@@ -575,4 +588,18 @@ test('a failed delete shows the error and keeps the transaction', async () => {
   expect(
     deleteButton('−$64.18 food expense on Sep 28, 2026'),
   ).toBeEnabled() // ready to try again
+})
+
+test('a failed delete leaves keyboard focus on its button', async () => {
+  vi.spyOn(window, 'confirm').mockReturnValue(true)
+  render(<App />)
+  await listItems()
+  fetch.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+  const button = deleteButton('−$64.18 food expense on Sep 28, 2026')
+  button.focus()
+
+  fireEvent.click(button)
+
+  await screen.findByText("Can't reach the server. Is the backend running?")
+  expect(button).toHaveFocus() // still next to its error, ready to retry
 })

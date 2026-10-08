@@ -18,18 +18,17 @@ Later tasks are a proposed order and may change.
 10. **Dashboard**: all-time income, expenses, and balance strip from `GET /summary`, refreshed after each add (PR #10)
 11. **Spending by category**: `GET /summary/categories?month=YYYY-MM` + this month's donut chart and legend (PR #11)
 12. **Monthly budgets**: standing budget per expense category (`/budgets` GET/PUT/DELETE), budget vs. spending meters; totals strip switched to this month (PR #12)
-
 13. **Visual identity**: banknote-engraving look (`DESIGN.md`), self-hosted Bodoni Moda for money figures, three-column desktop / phone-first layout, unboxed sections (PR #13)
-
 14. **Amount input polish**: `.5` accepted, budget amounts checked in the browser, midnight-proof date test (PR #14)
+15. **Delete a transaction**: `DELETE /transactions/{id}`, a confirm-then-delete button on each row, totals reload after (PR #15)
 
 ## In review
 
-15. **Delete a transaction**: `DELETE /transactions/{id}`, a confirm-then-delete button on each row, totals reload after (branch `feature/delete-transaction`)
+16. **Focus after a delete**: keyboard focus moves to the Transactions heading instead of the page top (branch `feature/focus-after-delete`)
 
 ## Planned
 
-Nothing yet. Candidates: the remaining follow-ups in `NextTime.md`, or editing a transaction in place (still undecided in `PRODUCT.md`).
+Nothing yet. Candidates: "today"/"this month" going stale past midnight (see `NextTime.md` follow-ups). Editing a transaction in place is still undecided in `PRODUCT.md`.
 
 ## Agreed decisions
 
