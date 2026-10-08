@@ -37,9 +37,19 @@ function App() {
   // useToday re-renders App when the date changes, even with the page left
   // open overnight. "2026-10-08".slice(0, 7) is the month: "2026-10".
   const today = useToday()
-  const month = today.slice(0, 7)
+  const thisMonth = today.slice(0, 7)
 
-  // This month's numbers, all calculated by the backend. null = not loaded yet.
+  // The month being looked at. null means "this month, whatever month that
+  // is" (the same trick as the form's date), so it moves on at midnight on
+  // the 1st, unless the user went back to an earlier month.
+  const [chosenMonth, setChosenMonth] = useState(null)
+  const month = chosenMonth ?? thisMonth
+
+  function showMonth(newMonth) {
+    setChosenMonth(newMonth === thisMonth ? null : newMonth)
+  }
+
+  // The month's numbers, all calculated by the backend. null = not loaded yet.
   const [summary, setSummary] = useState(null)
   const [summaryError, setSummaryError] = useState('')
   const [spending, setSpending] = useState(null)
@@ -47,7 +57,7 @@ function App() {
   const [budgets, setBudgets] = useState(null)
   const [budgetsError, setBudgetsError] = useState('')
 
-  // Reload everything that depends on this month's transactions. We never add
+  // Reload everything that depends on the month's transactions. We never add
   // up money in the browser: the backend does it in whole cents.
   function refreshMonth() {
     refresh(() => getSummary(month), setSummary, setSummaryError)
@@ -78,7 +88,7 @@ function App() {
   }, []) // the empty list [] means "run once"
 
   // Load the month's numbers after the first render, and again whenever the
-  // month changes (past midnight on the last day of the month).
+  // month changes (the user picks another month, or midnight on the 1st).
   useEffect(() => {
     refreshMonth()
     // The linter wants refreshMonth listed, but it's a new function on every
@@ -127,7 +137,13 @@ function App() {
         <p>Practice app: use made-up data only.</p>
       </header>
       <main>
-        <Summary month={month} summary={summary} error={summaryError} />
+        <Summary
+          month={month}
+          thisMonth={thisMonth}
+          onMonthChange={showMonth}
+          summary={summary}
+          error={summaryError}
+        />
         <div className="layout">
           <TransactionForm today={today} onAdd={addTransaction} />
           <TransactionList

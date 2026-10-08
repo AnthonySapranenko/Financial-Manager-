@@ -1,4 +1,4 @@
-import { monthName } from './dates.js'
+import { monthName, shiftMonth } from './dates.js'
 import { formatMoney } from './money.js'
 
 // Puts a sign in front of an amount, except for zero ("+$0.00" looks odd).
@@ -6,9 +6,21 @@ function withSign(sign, amount) {
   return amount === '0.00' ? formatMoney(amount) : sign + formatMoney(amount)
 }
 
+// A small chevron, drawn as SVG (pointing left; flipped in CSS for "next").
+// aria-hidden: the button's aria-label already says what it does.
+function Chevron() {
+  return (
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+      <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  )
+}
+
 // summary is what GET /summary?month=... returns, e.g.
 // { total_income: "2400.00", total_expenses: "1353.58", balance: "1046.42" }
-function Summary({ month, summary, error }) {
+// onMonthChange("2026-09") asks App to show another month. There's nothing
+// to see after this month, so "Next month" stops there.
+function Summary({ month, thisMonth, onMonthChange, summary, error }) {
   let content
   if (error) {
     content = (
@@ -49,7 +61,28 @@ function Summary({ month, summary, error }) {
 
   return (
     <section className="panel summary" aria-label="Totals">
-      <p className="summary-month">Totals for {monthName(month)}</p>
+      <div className="summary-month">
+        {/* aria-live: screen readers read out the new month after a click. */}
+        <p aria-live="polite">Totals for {monthName(month)}</p>
+        <div className="month-steps">
+          <button
+            type="button"
+            aria-label="Previous month"
+            onClick={() => onMonthChange(shiftMonth(month, -1))}
+          >
+            <Chevron />
+          </button>
+          <button
+            type="button"
+            className="next"
+            aria-label="Next month"
+            disabled={month === thisMonth}
+            onClick={() => onMonthChange(shiftMonth(month, 1))}
+          >
+            <Chevron />
+          </button>
+        </div>
+      </div>
       {content}
     </section>
   )

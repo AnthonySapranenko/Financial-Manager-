@@ -501,6 +501,47 @@ test("the totals strip shows this month's totals", async () => {
   await within(totals()).findByText('$2,335.82')
 })
 
+test('previous and next month switch the totals, spending, and budgets', async () => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 0, 20)) // Jan 20, 2026
+  render(<App />)
+  await listItems()
+  const next = screen.getByRole('button', { name: 'Next month' })
+  expect(next).toBeDisabled() // nothing to see after this month
+
+  // Back across the new year: January 2026 -> December 2025.
+  fireEvent.click(screen.getByRole('button', { name: 'Previous month' }))
+
+  expect(within(totals()).getByText('Totals for December 2025')).toBeInTheDocument()
+  expect(
+    screen.getByRole('heading', { name: 'Budgets · December 2025' }),
+  ).toBeInTheDocument()
+  expect(fetch).toHaveBeenCalledWith('/api/summary?month=2025-12', undefined)
+  expect(fetch).toHaveBeenCalledWith('/api/summary/categories?month=2025-12', undefined)
+  expect(fetch).toHaveBeenCalledWith('/api/budgets?month=2025-12', undefined)
+  expect(next).toBeEnabled()
+
+  fireEvent.click(next)
+  expect(within(totals()).getByText('Totals for January 2026')).toBeInTheDocument()
+  expect(next).toBeDisabled()
+  await within(totals()).findByText('$2,335.82') // let the reload finish
+})
+
+test('an earlier month stays chosen past midnight', async () => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 9, 31, 23, 59))
+  render(<App />)
+  await listItems()
+  fireEvent.click(screen.getByRole('button', { name: 'Previous month' }))
+
+  vi.setSystemTime(new Date(2026, 10, 1, 7, 30)) // November now
+  comeBackToPage()
+
+  expect(within(totals()).getByText('Totals for September 2026')).toBeInTheDocument()
+  // November exists now, so "Next month" works again.
+  expect(screen.getByRole('button', { name: 'Next month' })).toBeEnabled()
+})
+
 test('shows budget left, over budget, and no budget', async () => {
   render(<App />)
 

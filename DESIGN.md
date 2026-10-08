@@ -237,6 +237,7 @@ Firm and plain, like a stamped ticket.
 - **Hover / Focus:** Hover darkens to Deep Note Green. Focus shows a 2px green outline 2px outside the button (the same focus ring is used on every control).
 - **Disabled (saving):** Faded Ink background with a "wait" cursor.
 - **Small (budget "Save"):** White Field with green bold text and a Field Edge outline; hover turns the outline green.
+- **Month steps (previous / next month):** Two 2.25rem square buttons at the right of the totals plate's "Totals for [month]" line, styled like the small button, each holding a drawn SVG chevron (no text glyphs). "Next" is disabled on the current month: Hairline-coloured chevron and outline. The month text is read out by screen readers when it changes.
 - **Quiet (transaction "Delete"):** No box: underlined Faded Ink text at 0.875rem, on the same line as the row's date so rows don't grow. Hover turns it Note Seal Red. Deleting is rare and logging is common, so it never competes with the green primary button. It asks with the browser's own confirm box before deleting.
 
 ### Expense / Income toggle
@@ -247,7 +248,7 @@ Two real radio buttons styled as two large side-by-side buttons. Unselected: Whi
 - **Background:** Clean Sheet.
 - **Border:** 3px double ink, all four sides. The only framed object on the page.
 - **Internal Padding:** 1rem 1.25rem (tighter on phones).
-- **Content:** A small "Totals for [month]" line, then income − expenses = balance in Bodoni figures. A negative balance turns red with a "−".
+- **Content:** A small "Totals for [month]" line with the month steps at its right, then income − expenses = balance in Bodoni figures. A negative balance turns red with a "−".
 
 ### Inputs / Fields
 - **Style:** White Field, 1px Field Edge outline, 2px corners, 0.5rem 0.625rem padding, 1rem text. Budget inputs are smaller and right-aligned with equal-width digits.

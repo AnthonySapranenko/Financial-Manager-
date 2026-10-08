@@ -33,6 +33,14 @@ export function useToday() {
   return day
 }
 
+// "2026-01", -1 -> "2025-12". Date does the hard part: month -1 of 2026 is
+// December 2025, and month 12 of 2026 is January 2027.
+export function shiftMonth(month, by) {
+  const [year, monthNumber] = month.split('-').map(Number)
+  const shifted = new Date(year, monthNumber - 1 + by, 1)
+  return `${shifted.getFullYear()}-${String(shifted.getMonth() + 1).padStart(2, '0')}`
+}
+
 // "2026-10" -> "October 2026"
 export function monthName(month) {
   const [year, monthNumber] = month.split('-').map(Number)
