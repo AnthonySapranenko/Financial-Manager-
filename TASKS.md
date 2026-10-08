@@ -27,6 +27,7 @@ Later tasks are a proposed order and may change.
 ## In review
 
 17. **Stay current past midnight**: `useToday()` hook (checks every minute and when the tab comes back into view); the form's date and the month's numbers move on to the new day (branch `feature/stay-current-past-midnight`)
+18. **Browse past months**: previous/next month buttons on the totals plate; totals, spending, and budgets follow the chosen month; "next" stops at this month (branch `feature/browse-months`, on top of 17)
 
 ## Planned
 
