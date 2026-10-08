@@ -26,7 +26,7 @@ Last updated: 2026-10-08 (Task 21 in review)
   `App.jsx` (state; `month` = `chosenMonth ?? thisMonth`; one effect loads the
   month's numbers, keyed on `[month, reloads]`, with an `ignore` flag;
   `refreshMonth()` just bumps `reloads`), `Summary.jsx` (totals plate with
-  previous/next month buttons), `CategorySpending.jsx` (SVG donut + legend),
+  previous/next month buttons and an all-time balance footnote row), `CategorySpending.jsx` (SVG donut + legend),
   `Budgets.jsx`, `TransactionForm.jsx` (date state `null` = "today"),
   `TransactionList.jsx` (focus moves to the heading after a delete).
 - Tests (after Task 21): 59 backend (pytest) and 44 frontend (Vitest), all
@@ -42,6 +42,8 @@ from master. Candidates:
 - `PRODUCT.md` "Capabilities" section is out of date (lists the UI as
   planned); `Summary` docstring in `models.py` says "all transactions"
   though it also serves one month.
+- Possibly: a "back to this month" shortcut, or making the donut tooltips
+  keyboard-friendly (see follow-ups below). Small.
 - Category/type mismatch is allowed: an expense can be "salary" and income
   can be "food" (the developer's own sample data has both). Budgets already
   reject salary. Product call: restrict salary to income?
@@ -110,6 +112,17 @@ Small follow-ups found in reviews (not done yet):
 - One feature branch and one PR per task, always from an up-to-date
   `master`. Don't stack a new task on an unmerged branch: if the last PR
   isn't merged, stop and say so. The developer merges PRs on GitHub.
+- Exception (2026-10-08): when the developer asks for several tasks in one
+  unattended run ("do at least 4 tasks, don't ask me"), stacking is OK.
+  Each branch builds on the previous one, every PR targets master, and the
+  final report gives the merge order (normal merge commits, not squash).
+  The developer merged PRs #17–#20 that way without trouble.
+- When the developer says not to ask, that also overrides Impeccable's
+  "probe once" interview step: take direction from `DESIGN.md` and say so
+  in the report.
+- Product calls (anything marked undecided in `PRODUCT.md`) go to the
+  developer as a short multiple-choice question with a recommendation,
+  unless they've said not to ask.
 - The developer usually asks Claude to write the code, then wants a clear
   explanation and "try it yourself" steps.
 - Precedence: `BOSS.md` wins over the Ponytail plugin. Impeccable guides UI
@@ -123,7 +136,11 @@ Small follow-ups found in reviews (not done yet):
 | POST | `/transactions` | Body: `amount` (dollars, > 0, max 2 decimals), `type` (`income`/`expense`), `category`, `description` (optional, ≤ 200 characters), `transaction_date` (`YYYY-MM-DD`). Returns 201. |
 | GET | `/transactions` | Newest date first |
 | DELETE | `/transactions/{id}` | 204; also 204 if already gone; 422 if the id isn't a number |
-| GET | `/summary` | `total_income`, `total_expenses`, `balance` |
+| GET | `/summary` | `total_income`, `total_expenses`, `balance`; optional `?month=YYYY-MM`, otherwise all time |
+| GET | `/summary/categories` | `?month=YYYY-MM` (required): `month`, `total`, `categories` (largest first) |
+| GET | `/budgets` | `?month=YYYY-MM` (required): one row per expense category: `category`, `budget` (or null), `spent`, `remaining` (null without a budget, negative when over) |
+| PUT | `/budgets/{category}` | Body: `amount`. Creates or changes the budget; salary is a plain-text 422 |
+| DELETE | `/budgets/{category}` | 204; also 204 if there was no budget |
 
 Amounts come back as JSON **strings** (`"12.34"`), not numbers. Validation
 errors are 422 responses with FastAPI's `detail` list.
@@ -153,6 +170,14 @@ errors are 422 responses with FastAPI's `detail` list.
   direct 504px capture shows the same phone layout with real data.
 - Gotcha: when editing files with Python, pass `encoding="utf-8"` (the
   Windows default is cp1252), or use the Edit tool.
+- Gotcha: PowerShell 5.1's `Set-Content -Encoding utf8` writes a BOM. Strip
+  it (`sed -i '1s/^ï»¿//' file`) or edit with Python/Edit.
+- `vite preview` forwards `/api` like the dev server does (`preview.proxy`
+  defaults to `server.proxy`), so screenshots of a built app get real data.
+  Stop both servers afterwards (find them with `Get-CimInstance
+  Win32_Process` and match the command line).
+- Mutation check used this session: break the fix on purpose, confirm the
+  new test fails, then restore. Cheap proof that a test catches the bug.
 
 ## Known, deliberately deferred
 
@@ -161,6 +186,8 @@ errors are 422 responses with FastAPI's `detail` list.
 - The database stores enum names (`EXPENSE`) instead of values (`expense`).
   This is harmless while only the API writes to it.
 - Any date is accepted, including future dates. This is a product decision
-  the developer has not made yet.
+  the developer has not made yet. (Future-dated transactions also count in
+  the all-time balance.)
 - No paging on `GET /transactions`.
-- Editing and deleting transactions: undecided (see `PRODUCT.md`).
+- Editing a transaction in place: undecided (see `PRODUCT.md`). Deleting
+  was decided and built in Task 15.
