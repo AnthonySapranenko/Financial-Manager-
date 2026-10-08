@@ -29,6 +29,7 @@ Later tasks are a proposed order and may change.
 17. **Stay current past midnight**: `useToday()` hook (checks every minute and when the tab comes back into view); the form's date and the month's numbers move on to the new day (branch `feature/stay-current-past-midnight`)
 18. **Browse past months**: previous/next month buttons on the totals plate; totals, spending, and budgets follow the chosen month; "next" stops at this month (branch `feature/browse-months`, on top of 17)
 19. **Ignore stale responses**: every reload of the month's numbers goes through one effect with an `ignore` flag, so a late answer for an older request (fast month clicks, two quick adds) is thrown away (branch `feature/ignore-stale-responses`, on top of 18)
+20. **Phone spacing fix**: the phone `@media` block moved to the end of `index.css`, so its tighter spacing and smaller balance actually apply (later rules were overriding it) (branch `fix/phone-spacing`, on top of 19)
 
 ## Planned
 
