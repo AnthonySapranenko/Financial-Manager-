@@ -11,7 +11,7 @@ import {
 } from './api.js'
 import Budgets from './Budgets.jsx'
 import CategorySpending from './CategorySpending.jsx'
-import { currentMonth } from './dates.js'
+import { useToday } from './dates.js'
 import Summary from './Summary.jsx'
 import TransactionForm from './TransactionForm.jsx'
 import TransactionList from './TransactionList.jsx'
@@ -34,8 +34,12 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
 
+  // useToday re-renders App when the date changes, even with the page left
+  // open overnight. "2026-10-08".slice(0, 7) is the month: "2026-10".
+  const today = useToday()
+  const month = today.slice(0, 7)
+
   // This month's numbers, all calculated by the backend. null = not loaded yet.
-  const month = currentMonth()
   const [summary, setSummary] = useState(null)
   const [summaryError, setSummaryError] = useState('')
   const [spending, setSpending] = useState(null)
@@ -51,10 +55,9 @@ function App() {
     refresh(() => getBudgets(month), setBudgets, setBudgetsError)
   }
 
-  // Load everything once, after the first render. (In development, React runs
-  // effects twice on purpose to catch bugs; `ignore` makes the first,
-  // cancelled list load harmless. A second refreshMonth just stores the same
-  // numbers again.)
+  // Load the transactions once, after the first render. (In development,
+  // React runs effects twice on purpose to catch bugs; `ignore` makes the
+  // first, cancelled load harmless.)
   useEffect(() => {
     let ignore = false
 
@@ -69,16 +72,20 @@ function App() {
         if (!ignore) setLoading(false)
       })
 
-    refreshMonth()
-
     return () => {
       ignore = true
     }
-    // The empty list [] means "run once". The linter wants refreshMonth listed,
-    // but it's a new function on every render, so listing it would reload on
-    // every render. Running once is what we want here.
+  }, []) // the empty list [] means "run once"
+
+  // Load the month's numbers after the first render, and again whenever the
+  // month changes (past midnight on the last day of the month).
+  useEffect(() => {
+    refreshMonth()
+    // The linter wants refreshMonth listed, but it's a new function on every
+    // render, so listing it would reload on every render. month is the value
+    // that matters.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [month])
 
   // Save first, then show what the backend saved (it has the real id).
   // If saving fails, the error goes back to the form, which shows it.
@@ -122,7 +129,7 @@ function App() {
       <main>
         <Summary month={month} summary={summary} error={summaryError} />
         <div className="layout">
-          <TransactionForm onAdd={addTransaction} />
+          <TransactionForm today={today} onAdd={addTransaction} />
           <TransactionList
             transactions={transactions}
             loading={loading}

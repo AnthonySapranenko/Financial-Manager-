@@ -14,23 +14,18 @@ const CATEGORIES = [
   'other',
 ]
 
-// Today as "YYYY-MM-DD" in the user's own time zone. (new Date().toISOString()
-// uses UTC, which is already tomorrow on a US evening.)
-function today() {
-  const now = new Date()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
-  return `${now.getFullYear()}-${month}-${day}`
-}
-
 // onAdd is a function from the parent (App). We call it with the new
 // transaction; App decides what to do with it ("lifting state up").
-function TransactionForm({ onAdd }) {
+// today is "YYYY-MM-DD" from App, and it moves on at midnight.
+function TransactionForm({ today, onAdd }) {
   const [amount, setAmount] = useState('')
   const [type, setType] = useState('')
   const [category, setCategory] = useState('')
   const [description, setDescription] = useState('')
-  const [date, setDate] = useState(today())
+  // null means "today, whatever day that is": the date only gets its own
+  // value once the user picks one. So a form left open overnight shows the
+  // new day, but a date the user chose is never changed behind their back.
+  const [date, setDate] = useState(null)
   const [error, setError] = useState('') // problem with the amount
   const [saveError, setSaveError] = useState('') // the server refused or failed
   const [saving, setSaving] = useState(false)
@@ -54,14 +49,14 @@ function TransactionForm({ onAdd }) {
         type,
         category,
         description: description.trim(),
-        transaction_date: date,
+        transaction_date: date ?? today, // ?? : use today if date is null
       })
       // Saved: clear the form for the next entry.
       setAmount('')
       setType('')
       setCategory('')
       setDescription('')
-      setDate(today())
+      setDate(null)
     } catch (err) {
       // Not saved: keep what the user typed so they can fix it and retry.
       setSaveError(err.message)
@@ -140,7 +135,7 @@ function TransactionForm({ onAdd }) {
           Date
           <input
             type="date"
-            value={date}
+            value={date ?? today}
             onChange={(e) => setDate(e.target.value)}
             required
           />
