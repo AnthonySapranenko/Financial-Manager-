@@ -3,12 +3,19 @@
 Handoff notes for the next Claude Code session. Read this first, then
 `README.md`, `BOSS.md`, `TASKS.md`, and `PRODUCT.md`.
 
-Last updated: 2026-10-07 (Task 16 in review)
+Last updated: 2026-10-08 (Tasks 17–20 in review, stacked)
 
 ## Where we are
 
-- Tasks 1–15 are merged (PRs #1–#15). Task 16 (focus after a delete) is in
-  review on `feature/focus-after-delete`.
+- Tasks 1–16 are merged (PRs #1–#16). Tasks 17–20 were done in one
+  unattended run and are **stacked**: each branch is built on the previous
+  one, because they change the same lines of `App.jsx`. Merge them in order
+  (17 → 18 → 19 → 20), each with a normal merge commit (not squash), so the
+  next PR's diff shrinks to just its own change:
+  1. `feature/stay-current-past-midnight` (Task 17)
+  2. `feature/browse-months` (Task 18)
+  3. `feature/ignore-stale-responses` (Task 19)
+  4. `fix/phone-spacing` (Task 20)
 - When a PR is reported merged, verify before building on it: after
   `git fetch`, run `git merge-base --is-ancestor <branch> origin/master`.
 - Backend endpoints: `/health`; `POST`/`GET /transactions`;
@@ -21,30 +28,44 @@ Last updated: 2026-10-07 (Task 16 in review)
   `spending_by_category()`. Tables: `transactions`, `budgets` (category is the
   primary key).
 - Frontend (`frontend/src/`): `api.js` (all fetches; handles 204 and
-  plain-text 422), `dates.js` (`currentMonth`, `monthName`), `money.js`
-  (`formatMoney`, `isValidAmount`, `AMOUNT_ERROR`: the one amount rule used
-  by the transaction form and the budget rows), `App.jsx` (state; `refresh()`
-  helper, `refreshMonth()` reloads totals, spending, and budgets after each
-  add or delete; `removeTransaction()`), `Summary.jsx`
-  (this month's totals strip), `CategorySpending.jsx` (SVG donut + legend),
-  `Budgets.jsx` (one form per category row, meter bar, "Over by" in red
-  bold), `TransactionForm.jsx`, `TransactionList.jsx` (one `TransactionRow` per
-  transaction, with a confirm-then-delete button and its own error; after a
-  successful delete, focus moves to the heading via `headingRef`).
-- Tests: 59 backend (pytest) and 36 frontend (Vitest), all passing.
+  plain-text 422), `dates.js` (`useToday()` hook, `shiftMonth`,
+  `monthName`), `money.js` (`formatMoney`, `isValidAmount`, `AMOUNT_ERROR`),
+  `App.jsx` (state; `month` = `chosenMonth ?? thisMonth`; one effect loads the
+  month's numbers, keyed on `[month, reloads]`, with an `ignore` flag;
+  `refreshMonth()` just bumps `reloads`), `Summary.jsx` (totals plate with
+  previous/next month buttons), `CategorySpending.jsx` (SVG donut + legend),
+  `Budgets.jsx`, `TransactionForm.jsx` (date state `null` = "today"),
+  `TransactionList.jsx` (focus moves to the heading after a delete).
+- Tests (after Task 20): 59 backend (pytest) and 41 frontend (Vitest), all
+  passing.
 - Running the app needs both servers (see `README.md`). A manual run creates
   `backend/finance.db`; delete it to start empty.
 
-## Start here: Task 16 is in review
+## Start here: Tasks 17–20 are in review
 
-Task 16 (keyboard focus after a delete) is on `feature/focus-after-delete`.
-Once the developer merges it (verify with `git merge-base --is-ancestor`),
-pick Task 17. Suggested: **"today" and "this month" go stale past midnight**
-(teaches the `visibilitychange` event or a timer, and re-fetching). Bigger
-option, still the developer's call (undecided in `PRODUCT.md`): editing a
-transaction in place.
+Once all four are merged (verify the last one, `fix/phone-spacing`, with
+`git merge-base --is-ancestor`), pick Task 21 from master. Candidates:
+- Product call for the developer: the totals plate shows the month's net,
+  so the all-time "current balance" from `PRODUCT.md` isn't shown anywhere
+  since Task 12 (that switch was deliberate, "to match the other panels").
+- Editing a transaction in place (still undecided in `PRODUCT.md`).
+- `PRODUCT.md` "Capabilities" section is out of date (lists the UI as
+  planned).
 
 Recent tasks, for context:
+- Task 20: the phone `@media (max-width: 767px)` block was above the base
+  rules it overrides; same selector, so the later base rule won. Moved to
+  the end of `index.css` with a comment saying it must stay last.
+- Task 19: race conditions. Each run of the month effect has its own
+  `ignore`; React runs the previous run's cleanup first, so late answers
+  are dropped. Test: a slow September answer resolved after going back to
+  October.
+- Task 18: `shiftMonth(month, ±1)` (Date handles the year change). "Next"
+  is disabled on the current month. Choosing the current month stores
+  `null`, so it keeps following the date.
+- Task 17: `useToday()` re-checks every minute and on `visibilitychange`
+  (hidden tabs pause timers). Tests fire `visibilitychange` after
+  `vi.setSystemTime`.
 - Task 16: `TransactionList` wraps `onDelete`; after it resolves,
   `headingRef.current.focus()`. The `<h2>` has `tabIndex={-1}` (focusable by
   code, skipped by Tab). A failed delete throws first, so focus stays on the
@@ -65,10 +86,10 @@ unattended, so there was no direction round; if they want a different look,
 re-run Impeccable's new-work flow with them.
 
 Small follow-ups found in reviews (not done yet):
-- "Today" and "this month" are computed when the page loads, so they go
-  stale past midnight.
-- Two very fast adds could get responses out of order and briefly show
-  stale numbers (practically impossible on localhost).
+- After a month switch, the old month's numbers show under the new label
+  until the answers arrive (milliseconds on localhost). Clearing them would
+  make the panels flash "Loading…" and jump on every click.
+- No "back to this month" shortcut; clicking "Next" walks back.
 - Donut tooltips are mouse-only (the legend carries all values).
 - A budget row's input keeps its typed value if the budget changes elsewhere
   (e.g. another tab) until reload.
