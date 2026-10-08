@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { formatMoney } from './money.js'
 
 // Formats "2026-09-28" as "Sep 28, 2026". We build the Date from its parts
@@ -69,6 +69,20 @@ function TransactionRow({ transaction: t, onDelete }) {
 }
 
 function TransactionList({ transactions, loading, error, onDelete }) {
+  // A ref is a box React fills with the real <h2> element once it's on the
+  // page, so code can reach it: headingRef.current is the heading.
+  const headingRef = useRef(null)
+
+  // After a delete, the row and the button that had keyboard focus are gone,
+  // and the browser would drop focus back to the top of the page. Move it to
+  // the heading instead, so the next Tab lands on the remaining rows. If
+  // onDelete fails it throws, this line never runs, and focus stays on the
+  // button next to the error.
+  async function deleteAndKeepFocus(id) {
+    await onDelete(id)
+    headingRef.current.focus()
+  }
+
   // Pick what to show under the heading: one of four states.
   let content
   if (loading) {
@@ -91,7 +105,7 @@ function TransactionList({ transactions, loading, error, onDelete }) {
     content = (
       <ul className="transaction-list">
         {sorted.map((t) => (
-          <TransactionRow key={t.id} transaction={t} onDelete={onDelete} />
+          <TransactionRow key={t.id} transaction={t} onDelete={deleteAndKeepFocus} />
         ))}
       </ul>
     )
@@ -99,7 +113,10 @@ function TransactionList({ transactions, loading, error, onDelete }) {
 
   return (
     <section className="panel transactions" aria-labelledby="transactions-heading">
-      <h2 id="transactions-heading">Transactions</h2>
+      {/* tabIndex -1: code can focus the heading, but Tab still skips it. */}
+      <h2 id="transactions-heading" ref={headingRef} tabIndex={-1}>
+        Transactions
+      </h2>
       {content}
     </section>
   )
