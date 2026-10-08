@@ -16,17 +16,6 @@ import Summary from './Summary.jsx'
 import TransactionForm from './TransactionForm.jsx'
 import TransactionList from './TransactionList.jsx'
 
-// Fetch one thing and store it, or store its error. Each piece of data has
-// its own error, so one failing doesn't hide the others.
-async function refresh(fetchIt, setData, setError) {
-  try {
-    setData(await fetchIt())
-    setError('')
-  } catch (error) {
-    setError(error.message)
-  }
-}
-
 function App() {
   // App owns the list, because both the form (adds) and the list (shows)
   // need it. Children get the data and functions they need as props.
@@ -57,12 +46,14 @@ function App() {
   const [budgets, setBudgets] = useState(null)
   const [budgetsError, setBudgetsError] = useState('')
 
+  // Counts the changes that should reload the month's numbers. Bumping it
+  // re-runs the effect below, so every reload goes through one place.
+  const [reloads, setReloads] = useState(0)
+
   // Reload everything that depends on the month's transactions. We never add
   // up money in the browser: the backend does it in whole cents.
   function refreshMonth() {
-    refresh(() => getSummary(month), setSummary, setSummaryError)
-    refresh(() => getCategorySpending(month), setSpending, setSpendingError)
-    refresh(() => getBudgets(month), setBudgets, setBudgetsError)
+    setReloads((count) => count + 1)
   }
 
   // Load the transactions once, after the first render. (In development,
@@ -88,14 +79,41 @@ function App() {
   }, []) // the empty list [] means "run once"
 
   // Load the month's numbers after the first render, and again whenever the
-  // month changes (the user picks another month, or midnight on the 1st).
+  // month changes (the user picks another month, or midnight on the 1st) or
+  // something was saved (reloads went up).
+  //
+  // Answers can come back in any order. Click "Previous month" twice
+  // quickly, and September's answer might arrive after August's, so the
+  // page would say August but show September's numbers. To stop that, each
+  // run of this effect has its own `ignore` flag. When month or reloads
+  // changes, React first runs the cleanup of the previous run (ignore =
+  // true), so a late answer to an older request is thrown away.
   useEffect(() => {
-    refreshMonth()
-    // The linter wants refreshMonth listed, but it's a new function on every
-    // render, so listing it would reload on every render. month is the value
-    // that matters.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [month])
+    let ignore = false
+
+    // Fetch one thing and store it, or store its error. Each piece of data
+    // has its own error, so one failing doesn't hide the others.
+    function load(fetchIt, setData, setError) {
+      fetchIt().then(
+        (data) => {
+          if (ignore) return
+          setData(data)
+          setError('')
+        },
+        (error) => {
+          if (!ignore) setError(error.message)
+        },
+      )
+    }
+
+    load(() => getSummary(month), setSummary, setSummaryError)
+    load(() => getCategorySpending(month), setSpending, setSpendingError)
+    load(() => getBudgets(month), setBudgets, setBudgetsError)
+
+    return () => {
+      ignore = true
+    }
+  }, [month, reloads])
 
   // Save first, then show what the backend saved (it has the real id).
   // If saving fails, the error goes back to the form, which shows it.
@@ -103,8 +121,8 @@ function App() {
     const saved = await createTransaction(transaction)
     // Make a new array instead of changing the old one, so React notices.
     setTransactions((current) => [saved, ...current])
-    // Not awaited: the form can clear right away. refresh handles its own
-    // errors, because the transaction is already saved.
+    // The form can clear right away: the reload happens in the effect, which
+    // handles its own errors, because the transaction is already saved.
     refreshMonth()
   }
 
@@ -124,7 +142,7 @@ function App() {
     } else {
       await setBudget(category, amount)
     }
-    await refresh(() => getBudgets(month), setBudgets, setBudgetsError)
+    refreshMonth()
   }
 
   // Order matters on phones, where everything is one column: logging first,

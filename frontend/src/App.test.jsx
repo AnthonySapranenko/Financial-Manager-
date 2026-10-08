@@ -527,6 +527,35 @@ test('previous and next month switch the totals, spending, and budgets', async (
   await within(totals()).findByText('$2,335.82') // let the reload finish
 })
 
+test("a late answer for an earlier month doesn't replace the current one", async () => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 9, 20)) // October 2026
+  // September's totals answer only when the test says so (a slow request).
+  let answerSeptember
+  const septemberAnswered = new Promise((resolve) => {
+    answerSeptember = resolve
+  })
+  fetch.mockImplementation(async (url, options) => {
+    if (url === '/api/summary?month=2026-09') {
+      await septemberAnswered
+      return respond({ total_income: '0.00', total_expenses: '9.99', balance: '-9.99' })
+    }
+    return fakeBackend(url, options)
+  })
+  render(<App />)
+  await listItems()
+
+  // Go to September (its answer is still on the way), then straight back.
+  fireEvent.click(screen.getByRole('button', { name: 'Previous month' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Next month' }))
+  // Now September's answer finally arrives, last.
+  await act(async () => answerSeptember())
+
+  expect(within(totals()).getByText('Totals for October 2026')).toBeInTheDocument()
+  expect(within(totals()).getByText('$2,335.82')).toBeInTheDocument()
+  expect(within(totals()).queryByText('−$9.99')).not.toBeInTheDocument()
+})
+
 test('an earlier month stays chosen past midnight', async () => {
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(new Date(2026, 9, 31, 23, 59))
