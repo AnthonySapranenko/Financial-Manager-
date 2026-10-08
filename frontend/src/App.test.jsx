@@ -37,6 +37,14 @@ const SUMMARY = {
 }
 let summary
 
+// What our fake GET /summary (no month) answers: all-time totals.
+const OVERALL = {
+  total_income: '9600.00',
+  total_expenses: '4479.60',
+  balance: '5120.40',
+}
+let overall
+
 // What our fake GET /summary/categories answers for this month.
 function thisMonth() {
   const now = new Date()
@@ -60,6 +68,7 @@ let budgets
 // The fake backend: answers each URL like the real API would.
 function fakeBackend(url, options) {
   if (url.startsWith('/api/summary/categories')) return respond(spending)
+  if (url === '/api/summary') return respond(overall)
   if (url.startsWith('/api/summary')) return respond(summary)
   if (url.startsWith('/api/budgets/')) {
     // PUT returns the saved budget; DELETE returns 204, no body.
@@ -86,6 +95,7 @@ function respond(body, status = 200) {
 // (vi.fn) that answers by URL and records how it was called.
 beforeEach(() => {
   summary = SUMMARY
+  overall = OVERALL
   spending = SPENDING
   budgets = BUDGETS
   vi.stubGlobal(
@@ -357,6 +367,45 @@ test('shows income, expenses, and balance from the API', async () => {
   expect(await within(totals()).findByText('+$2,400.00')).toBeInTheDocument()
   expect(within(totals()).getByText('−$64.18')).toBeInTheDocument()
   expect(within(totals()).getByText('$2,335.82')).not.toHaveClass('expense')
+})
+
+test('shows the all-time balance under the month', async () => {
+  render(<App />)
+
+  const line = await within(totals()).findByText('All-time balance')
+  expect(line).toHaveTextContent('All-time balance$5,120.40')
+  expect(fetch).toHaveBeenCalledWith('/api/summary', undefined)
+})
+
+test('a negative all-time balance is red with a minus sign', async () => {
+  overall = { total_income: '0.00', total_expenses: '20.00', balance: '-20.00' }
+  render(<App />)
+
+  const amount = await within(totals()).findByText('−$20.00')
+  expect(amount).toHaveClass('expense')
+})
+
+test('the all-time balance reloads after adding a transaction', async () => {
+  render(<App />)
+  await within(totals()).findByText('$5,120.40')
+  fetch.mockResolvedValueOnce(
+    respond(
+      {
+        id: 3,
+        amount: '100.00',
+        type: 'income',
+        category: 'salary',
+        description: '',
+        transaction_date: '2026-09-30',
+      },
+      201,
+    ),
+  )
+  overall = { ...OVERALL, balance: '5220.40' }
+
+  addTransaction({ amount: '100', type: 'Income', category: 'salary' })
+
+  expect(await within(totals()).findByText('$5,220.40')).toBeInTheDocument()
 })
 
 test('shows a negative balance in red with a minus sign', async () => {

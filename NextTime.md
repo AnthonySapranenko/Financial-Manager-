@@ -3,19 +3,12 @@
 Handoff notes for the next Claude Code session. Read this first, then
 `README.md`, `BOSS.md`, `TASKS.md`, and `PRODUCT.md`.
 
-Last updated: 2026-10-08 (Tasks 17–20 in review, stacked)
+Last updated: 2026-10-08 (Task 21 in review)
 
 ## Where we are
 
-- Tasks 1–16 are merged (PRs #1–#16). Tasks 17–20 were done in one
-  unattended run and are **stacked**: each branch is built on the previous
-  one, because they change the same lines of `App.jsx`. Merge them in order
-  (17 → 18 → 19 → 20), each with a normal merge commit (not squash), so the
-  next PR's diff shrinks to just its own change:
-  1. `feature/stay-current-past-midnight` (Task 17)
-  2. `feature/browse-months` (Task 18)
-  3. `feature/ignore-stale-responses` (Task 19)
-  4. `fix/phone-spacing` (Task 20)
+- Tasks 1–20 are merged (PRs #1–#20). Task 21 (all-time balance) is in
+  review on `feature/all-time-balance`.
 - When a PR is reported merged, verify before building on it: after
   `git fetch`, run `git merge-base --is-ancestor <branch> origin/master`.
 - Backend endpoints: `/health`; `POST`/`GET /transactions`;
@@ -36,23 +29,28 @@ Last updated: 2026-10-08 (Tasks 17–20 in review, stacked)
   previous/next month buttons), `CategorySpending.jsx` (SVG donut + legend),
   `Budgets.jsx`, `TransactionForm.jsx` (date state `null` = "today"),
   `TransactionList.jsx` (focus moves to the heading after a delete).
-- Tests (after Task 20): 59 backend (pytest) and 41 frontend (Vitest), all
+- Tests (after Task 21): 59 backend (pytest) and 44 frontend (Vitest), all
   passing.
 - Running the app needs both servers (see `README.md`). A manual run creates
   `backend/finance.db`; delete it to start empty.
 
-## Start here: Tasks 17–20 are in review
+## Start here: Task 21 is in review
 
-Once all four are merged (verify the last one, `fix/phone-spacing`, with
-`git merge-base --is-ancestor`), pick Task 21 from master. Candidates:
-- Product call for the developer: the totals plate shows the month's net,
-  so the all-time "current balance" from `PRODUCT.md` isn't shown anywhere
-  since Task 12 (that switch was deliberate, "to match the other panels").
+Once it's merged (verify with `git merge-base --is-ancestor`), pick Task 22
+from master. Candidates:
 - Editing a transaction in place (still undecided in `PRODUCT.md`).
 - `PRODUCT.md` "Capabilities" section is out of date (lists the UI as
-  planned).
+  planned); `Summary` docstring in `models.py` says "all transactions"
+  though it also serves one month.
+- Category/type mismatch is allowed: an expense can be "salary" and income
+  can be "food" (the developer's own sample data has both). Budgets already
+  reject salary. Product call: restrict salary to income?
 
 Recent tasks, for context:
+- Task 21: `getSummary()` with no month calls `GET /summary` (all time).
+  App loads it in the month effect (it changes whenever a transaction
+  does). `Summary.jsx` shows it as a footnote row; `balanceText()` /
+  `balanceClass()` format both balances the same way.
 - Task 20: the phone `@media (max-width: 767px)` block was above the base
   rules it overrides; same selector, so the later base rule won. Moved to
   the end of `index.css` with a comment saying it must stay last.

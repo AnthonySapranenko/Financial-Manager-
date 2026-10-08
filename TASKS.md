@@ -21,15 +21,15 @@ Later tasks are a proposed order and may change.
 13. **Visual identity**: banknote-engraving look (`DESIGN.md`), self-hosted Bodoni Moda for money figures, three-column desktop / phone-first layout, unboxed sections (PR #13)
 14. **Amount input polish**: `.5` accepted, budget amounts checked in the browser, midnight-proof date test (PR #14)
 15. **Delete a transaction**: `DELETE /transactions/{id}`, a confirm-then-delete button on each row, totals reload after (PR #15)
-
 16. **Focus after a delete**: keyboard focus moves to the Transactions heading instead of the page top (PR #16)
+17. **Stay current past midnight**: `useToday()` hook (checks every minute and when the tab comes back into view); the form's date and the month's numbers move on to the new day (PR #17)
+18. **Browse past months**: previous/next month buttons on the totals plate; totals, spending, and budgets follow the chosen month; "next" stops at this month (PR #18)
+19. **Ignore stale responses**: every reload of the month's numbers goes through one effect with an `ignore` flag, so a late answer for an older request (fast month clicks, two quick adds) is thrown away (PR #19)
+20. **Phone spacing fix**: the phone `@media` block moved to the end of `index.css`, so its tighter spacing and smaller balance actually apply (later rules were overriding it) (PR #20)
 
 ## In review
 
-17. **Stay current past midnight**: `useToday()` hook (checks every minute and when the tab comes back into view); the form's date and the month's numbers move on to the new day (branch `feature/stay-current-past-midnight`)
-18. **Browse past months**: previous/next month buttons on the totals plate; totals, spending, and budgets follow the chosen month; "next" stops at this month (branch `feature/browse-months`, on top of 17)
-19. **Ignore stale responses**: every reload of the month's numbers goes through one effect with an `ignore` flag, so a late answer for an older request (fast month clicks, two quick adds) is thrown away (branch `feature/ignore-stale-responses`, on top of 18)
-20. **Phone spacing fix**: the phone `@media` block moved to the end of `index.css`, so its tighter spacing and smaller balance actually apply (later rules were overriding it) (branch `fix/phone-spacing`, on top of 19)
+21. **All-time balance**: a footnote row on the totals plate with the balance across all months, from `GET /summary` with no month (branch `feature/all-time-balance`)
 
 ## Planned
 

@@ -211,6 +211,29 @@ main {
   margin: 0;
 }
 
+/* The all-time balance: a footnote under the month's sum, below a hairline,
+   so the month's equation stays the main thing on the plate. */
+.summary-overall {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin: 0.75rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.summary-overall .amount {
+  font-size: 1.125rem;
+}
+
+.summary-overall .amount:not(.expense) {
+  color: var(--ink);
+}
+
 /* Previous / next month: small square buttons, like the budget "Save". */
 .month-steps {
   display: flex;

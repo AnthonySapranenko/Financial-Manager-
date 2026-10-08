@@ -248,7 +248,7 @@ Two real radio buttons styled as two large side-by-side buttons. Unselected: Whi
 - **Background:** Clean Sheet.
 - **Border:** 3px double ink, all four sides. The only framed object on the page.
 - **Internal Padding:** 1rem 1.25rem (tighter on phones).
-- **Content:** A small "Totals for [month]" line with the month steps at its right, then income − expenses = balance in Bodoni figures. A negative balance turns red with a "−".
+- **Content:** A small "Totals for [month]" line with the month steps at its right, then income − expenses = balance in Bodoni figures. A negative balance turns red with a "−". Under a hairline at the bottom, a footnote row: "All-time balance" (label style, Faded Ink) on the left and the all-time figure (1.125rem, ink, or red with "−" when negative) on the right.
 
 ### Inputs / Fields
 - **Style:** White Field, 1px Field Edge outline, 2px corners, 0.5rem 0.625rem padding, 1rem text. Budget inputs are smaller and right-aligned with equal-width digits.

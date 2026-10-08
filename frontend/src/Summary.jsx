@@ -16,11 +16,32 @@ function Chevron() {
   )
 }
 
+// The balance is the only total that can be negative: "-150.00" is shown as
+// "−$150.00" (a real minus sign, like expenses), "1046.42" as "$1,046.42".
+function balanceText(balance) {
+  return balance.startsWith('-')
+    ? withSign('−', balance.slice(1)) // drop the "-"
+    : formatMoney(balance)
+}
+
+function balanceClass(balance) {
+  return balance.startsWith('-') ? 'amount expense' : 'amount'
+}
+
 // summary is what GET /summary?month=... returns, e.g.
 // { total_income: "2400.00", total_expenses: "1353.58", balance: "1046.42" }
 // onMonthChange("2026-09") asks App to show another month. There's nothing
 // to see after this month, so "Next month" stops there.
-function Summary({ month, thisMonth, onMonthChange, summary, error }) {
+// overall is what GET /summary returns (no month): the all-time totals.
+function Summary({
+  month,
+  thisMonth,
+  onMonthChange,
+  summary,
+  error,
+  overall,
+  overallError,
+}) {
   let content
   if (error) {
     content = (
@@ -31,8 +52,6 @@ function Summary({ month, thisMonth, onMonthChange, summary, error }) {
   } else if (!summary) {
     content = <p className="empty">Loading totals…</p>
   } else {
-    // The balance is the only total that can be negative: "-150.00".
-    const negative = summary.balance.startsWith('-')
     content = (
       <dl className="totals">
         <div>
@@ -49,10 +68,8 @@ function Summary({ month, thisMonth, onMonthChange, summary, error }) {
         </div>
         <div>
           <dt>Balance</dt>
-          <dd className={negative ? 'amount balance expense' : 'amount balance'}>
-            {negative
-              ? withSign('−', summary.balance.slice(1)) // drop the "-"
-              : formatMoney(summary.balance)}
+          <dd className={`${balanceClass(summary.balance)} balance`}>
+            {balanceText(summary.balance)}
           </dd>
         </div>
       </dl>
@@ -84,6 +101,24 @@ function Summary({ month, thisMonth, onMonthChange, summary, error }) {
         </div>
       </div>
       {content}
+      {/* What all the months add up to: the money you have now. Hidden while
+          loading; if the month's totals failed too, their error says enough. */}
+      {overallError && !error && (
+        <p className="summary-overall">
+          All-time balance
+          <span className="load-error" role="alert">
+            {overallError}
+          </span>
+        </p>
+      )}
+      {overall && !overallError && (
+        <p className="summary-overall">
+          All-time balance
+          <span className={balanceClass(overall.balance)}>
+            {balanceText(overall.balance)}
+          </span>
+        </p>
+      )}
     </section>
   )
 }
