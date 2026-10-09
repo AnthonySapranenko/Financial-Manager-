@@ -185,6 +185,10 @@ errors are 422 responses with FastAPI's `detail` list.
   `--remote-debugging-port`). Foreground `sleep` is blocked, and one long
   combined command got rejected. Node 24 has `fetch` and `WebSocket`
   built in, so a ~30-line CDP script can click and screenshot.
+- `.claude/settings.json` allows the common read-only checks without a
+  prompt (`npm run lint`, `npx vitest --run`, `npm test -- --run`, pytest,
+  `git fetch`, `git merge-base`). Run them in Bash, not behind a
+  PowerShell `$env:Path = ...;` prefix, or the rules don't match.
 - Mutation check used this session: break the fix on purpose, confirm the
   new test fails, then restore. Cheap proof that a test catches the bug.
 
