@@ -620,6 +620,43 @@ test('an earlier month stays chosen past midnight', async () => {
   expect(screen.getByRole('button', { name: 'Next month' })).toBeEnabled()
 })
 
+test('"This month" jumps back from an earlier month', async () => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 9, 20)) // October 2026
+  render(<App />)
+  await listItems()
+  // Nothing to jump back to yet.
+  expect(screen.queryByRole('button', { name: 'This month' })).not.toBeInTheDocument()
+
+  const previous = screen.getByRole('button', { name: 'Previous month' })
+  fireEvent.click(previous)
+  fireEvent.click(previous)
+  expect(within(totals()).getByText('Totals for August 2026')).toBeInTheDocument()
+
+  fireEvent.click(screen.getByRole('button', { name: 'This month' }))
+
+  expect(within(totals()).getByText('Totals for October 2026')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'This month' })).not.toBeInTheDocument()
+  // The clicked button is gone, so keyboard focus lands on "Previous month"
+  // instead of falling back to the top of the page.
+  expect(previous).toHaveFocus()
+  await within(totals()).findByText('$2,335.82') // let the reload finish
+})
+
+test('"Next month" hands focus to "Previous month" when it turns disabled', async () => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 9, 20)) // October 2026
+  render(<App />)
+  await listItems()
+  fireEvent.click(screen.getByRole('button', { name: 'Previous month' }))
+
+  fireEvent.click(screen.getByRole('button', { name: 'Next month' }))
+
+  expect(screen.getByRole('button', { name: 'Next month' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Previous month' })).toHaveFocus()
+  await within(totals()).findByText('$2,335.82')
+})
+
 test('shows budget left, over budget, and no budget', async () => {
   render(<App />)
 

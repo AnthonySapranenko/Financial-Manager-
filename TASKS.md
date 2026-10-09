@@ -27,9 +27,11 @@ Later tasks are a proposed order and may change.
 19. **Ignore stale responses**: every reload of the month's numbers goes through one effect with an `ignore` flag, so a late answer for an older request (fast month clicks, two quick adds) is thrown away (PR #19)
 20. **Phone spacing fix**: the phone `@media` block moved to the end of `index.css`, so its tighter spacing and smaller balance actually apply (later rules were overriding it) (PR #20)
 
+21. **All-time balance**: a footnote row on the totals plate with the balance across all months, from `GET /summary` with no month (PR #21)
+
 ## In review
 
-21. **All-time balance**: a footnote row on the totals plate with the balance across all months, from `GET /summary` with no month (branch `feature/all-time-balance`)
+22. **"This month" shortcut**: a quiet "This month" link next to the month buttons, shown only on an earlier month; keyboard focus moves to "Previous month" when the clicked button disappears or turns disabled (branch `feature/this-month-shortcut`)
 
 ## Planned
 

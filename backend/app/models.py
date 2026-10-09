@@ -88,7 +88,8 @@ class TransactionRead(SQLModel):
 
 
 class Summary(SQLModel):
-    """Totals across all transactions, in dollars."""
+    """Total income, expenses, and balance, in dollars: for one month, or
+    for all transactions when no month is given."""
 
     total_income: Decimal
     total_expenses: Decimal

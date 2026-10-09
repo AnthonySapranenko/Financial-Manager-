@@ -50,15 +50,17 @@ Both phone and desktop browsers matter.
 
 ## Capabilities and Constraints
 
-Built so far (backend API):
+Built so far (one page, backed by the API):
 
 - Add a transaction: amount, income or expense, category, optional
-  description (up to 200 characters), and date.
-- List transactions, newest first.
-- Summary: total income, total expenses, and balance.
+  description (up to 200 characters), and date (today by default).
+- List transactions, newest first, and delete one after a confirm step.
+- Totals for one month (income, expenses, balance), with previous/next
+  month buttons and a "This month" shortcut, plus the all-time balance.
+- Spending by category for the month (donut chart and legend).
+- One standing monthly budget per expense category, with spending against it.
 
-Planned (see `TASKS.md`): the transaction form and list in the UI, a dashboard,
-spending by category, and one monthly budget per category.
+Planned: nothing yet (see `TASKS.md`).
 
 Terminology and rules:
 
