@@ -263,6 +263,24 @@ main {
   cursor: default;
 }
 
+/* "This month": a quiet underlined link, like a row's "Delete", so the
+   chevrons stay the main controls. Same height, so the row doesn't jump. */
+.month-steps .this-month {
+  width: auto;
+  padding: 0 0.25rem;
+  font: inherit;
+  color: var(--ink-muted);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  white-space: nowrap; /* on narrow phones the month label wraps instead */
+}
+
+.month-steps .this-month:hover {
+  color: var(--green);
+}
+
 .month-steps .next svg {
   transform: scaleX(-1); /* the same chevron, pointing right */
 }

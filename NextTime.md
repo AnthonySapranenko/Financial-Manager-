@@ -3,12 +3,12 @@
 Handoff notes for the next Claude Code session. Read this first, then
 `README.md`, `BOSS.md`, `TASKS.md`, and `PRODUCT.md`.
 
-Last updated: 2026-10-08 (Task 21 in review)
+Last updated: 2026-10-08 (Task 22 in review)
 
 ## Where we are
 
-- Tasks 1–20 are merged (PRs #1–#20). Task 21 (all-time balance) is in
-  review on `feature/all-time-balance`.
+- Tasks 1–21 are merged (PRs #1–#21). Task 22 ("This month" shortcut) is
+  in review on `feature/this-month-shortcut`.
 - When a PR is reported merged, verify before building on it: after
   `git fetch`, run `git merge-base --is-ancestor <branch> origin/master`.
 - Backend endpoints: `/health`; `POST`/`GET /transactions`;
@@ -26,29 +26,34 @@ Last updated: 2026-10-08 (Task 21 in review)
   `App.jsx` (state; `month` = `chosenMonth ?? thisMonth`; one effect loads the
   month's numbers, keyed on `[month, reloads]`, with an `ignore` flag;
   `refreshMonth()` just bumps `reloads`), `Summary.jsx` (totals plate with
-  previous/next month buttons and an all-time balance footnote row), `CategorySpending.jsx` (SVG donut + legend),
+  previous/next month buttons, a "This month" shortcut, and an all-time
+  balance footnote row), `CategorySpending.jsx` (SVG donut + legend),
   `Budgets.jsx`, `TransactionForm.jsx` (date state `null` = "today"),
   `TransactionList.jsx` (focus moves to the heading after a delete).
-- Tests (after Task 21): 59 backend (pytest) and 44 frontend (Vitest), all
+- Tests (after Task 22): 59 backend (pytest) and 46 frontend (Vitest), all
   passing.
 - Running the app needs both servers (see `README.md`). A manual run creates
   `backend/finance.db`; delete it to start empty.
 
-## Start here: Task 21 is in review
+## Start here: Task 22 is in review
 
-Once it's merged (verify with `git merge-base --is-ancestor`), pick Task 22
+Once it's merged (verify with `git merge-base --is-ancestor`), pick Task 23
 from master. Candidates:
 - Editing a transaction in place (still undecided in `PRODUCT.md`).
-- `PRODUCT.md` "Capabilities" section is out of date (lists the UI as
-  planned); `Summary` docstring in `models.py` says "all transactions"
-  though it also serves one month.
-- Possibly: a "back to this month" shortcut, or making the donut tooltips
-  keyboard-friendly (see follow-ups below). Small.
 - Category/type mismatch is allowed: an expense can be "salary" and income
   can be "food" (the developer's own sample data has both). Budgets already
   reject salary. Product call: restrict salary to income?
+- Making the donut tooltips keyboard-friendly (see follow-ups below). Small.
 
 Recent tasks, for context:
+- Task 22: `Summary.jsx` shows a "This month" button only when
+  `month !== thisMonth`; it calls `onMonthChange(thisMonth)`, which stores
+  `null`, so the page follows the date again. `goTo()` moves focus to
+  "Previous month" (a ref) whenever the new month is this month, because the
+  clicked button vanishes ("This month") or turns disabled ("Next month").
+  Also fixed: `PRODUCT.md` "Capabilities" and the `Summary` docstring.
+  Screenshots via a throwaway Node CDP script (not in the repo); with
+  "This month" showing, long month names wrap the label at 390px.
 - Task 21: `getSummary()` with no month calls `GET /summary` (all time).
   App loads it in the month effect (it changes whenever a transaction
   does). `Summary.jsx` shows it as a footnote row; `balanceText()` /
@@ -89,7 +94,6 @@ Small follow-ups found in reviews (not done yet):
 - After a month switch, the old month's numbers show under the new label
   until the answers arrive (milliseconds on localhost). Clearing them would
   make the panels flash "Loading…" and jump on every click.
-- No "back to this month" shortcut; clicking "Next" walks back.
 - Donut tooltips are mouse-only (the legend carries all values).
 - A budget row's input keeps its typed value if the budget changes elsewhere
   (e.g. another tab) until reload.
@@ -176,6 +180,11 @@ errors are 422 responses with FastAPI's `detail` list.
   defaults to `server.proxy`), so screenshots of a built app get real data.
   Stop both servers afterwards (find them with `Get-CimInstance
   Win32_Process` and match the command line).
+- Starting servers from Claude: use separate background commands (one each
+  for uvicorn, `vite preview`, headless Edge with
+  `--remote-debugging-port`). Foreground `sleep` is blocked, and one long
+  combined command got rejected. Node 24 has `fetch` and `WebSocket`
+  built in, so a ~30-line CDP script can click and screenshot.
 - Mutation check used this session: break the fix on purpose, confirm the
   new test fails, then restore. Cheap proof that a test catches the bug.
 

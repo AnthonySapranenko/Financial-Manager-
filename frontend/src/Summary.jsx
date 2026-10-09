@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { monthName, shiftMonth } from './dates.js'
 import { formatMoney } from './money.js'
 
@@ -42,6 +43,17 @@ function Summary({
   overall,
   overallError,
 }) {
+  // Arriving at this month hides "This month" and disables "Next month".
+  // A focused button that disappears or turns disabled drops keyboard focus
+  // to the top of the page, so focus moves to "Previous month", which is
+  // always there.
+  const previousRef = useRef(null)
+
+  function goTo(newMonth) {
+    onMonthChange(newMonth)
+    if (newMonth === thisMonth) previousRef.current.focus()
+  }
+
   let content
   if (error) {
     content = (
@@ -82,10 +94,22 @@ function Summary({
         {/* aria-live: screen readers read out the new month after a click. */}
         <p aria-live="polite">Totals for {monthName(month)}</p>
         <div className="month-steps">
+          {/* A way back after browsing far into the past. Only shown when
+              it would do something. */}
+          {month !== thisMonth && (
+            <button
+              type="button"
+              className="this-month"
+              onClick={() => goTo(thisMonth)}
+            >
+              This month
+            </button>
+          )}
           <button
             type="button"
             aria-label="Previous month"
-            onClick={() => onMonthChange(shiftMonth(month, -1))}
+            ref={previousRef}
+            onClick={() => goTo(shiftMonth(month, -1))}
           >
             <Chevron />
           </button>
@@ -94,7 +118,7 @@ function Summary({
             className="next"
             aria-label="Next month"
             disabled={month === thisMonth}
-            onClick={() => onMonthChange(shiftMonth(month, 1))}
+            onClick={() => goTo(shiftMonth(month, 1))}
           >
             <Chevron />
           </button>
