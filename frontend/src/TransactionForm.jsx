@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AMOUNT_ERROR, isValidAmount } from './money.js'
 
 // The fixed list from the backend (see TASKS.md "Agreed decisions").
@@ -17,18 +17,33 @@ const CATEGORIES = [
 // onAdd is a function from the parent (App). We call it with the new
 // transaction; App decides what to do with it ("lifting state up").
 // today is "YYYY-MM-DD" from App, and it moves on at midnight.
-function TransactionForm({ today, onAdd }) {
-  const [amount, setAmount] = useState('')
-  const [type, setType] = useState('')
-  const [category, setCategory] = useState('')
-  const [description, setDescription] = useState('')
+//
+// editing is a saved transaction to change, or null to add a new one. The
+// starting values below are only read when the form first appears, so App
+// gives the form a different `key` for each transaction it edits: React
+// then throws the old form away and builds a new one, filled in fresh.
+// onSave(id, transaction) saves the changes; onCancel stops editing.
+// focusOnStart: move keyboard focus to the heading when the form appears.
+function TransactionForm({ today, onAdd, editing, onSave, onCancel, focusOnStart }) {
+  const [amount, setAmount] = useState(editing?.amount ?? '')
+  const [type, setType] = useState(editing?.type ?? '')
+  const [category, setCategory] = useState(editing?.category ?? '')
+  const [description, setDescription] = useState(editing?.description ?? '')
   // null means "today, whatever day that is": the date only gets its own
   // value once the user picks one. So a form left open overnight shows the
   // new day, but a date the user chose is never changed behind their back.
-  const [date, setDate] = useState(null)
+  const [date, setDate] = useState(editing?.transaction_date ?? null)
   const [error, setError] = useState('') // problem with the amount
   const [saveError, setSaveError] = useState('') // the server refused or failed
   const [saving, setSaving] = useState(false)
+
+  // Starting or finishing an edit swaps the form (see `key` above), and the
+  // button that had focus is gone. Focus the heading instead: it says which
+  // mode the form is in, and on a phone it scrolls the form into view.
+  const headingRef = useRef(null)
+  useEffect(() => {
+    if (focusOnStart) headingRef.current.focus()
+  }, [focusOnStart])
 
   async function handleSubmit(event) {
     event.preventDefault() // stop the browser from reloading the page
@@ -42,15 +57,21 @@ function TransactionForm({ today, onAdd }) {
     setSaveError('')
     setSaving(true)
 
+    const transaction = {
+      amount: trimmed,
+      type,
+      category,
+      description: description.trim(),
+      transaction_date: date ?? today, // ?? : use today if date is null
+    }
     try {
+      if (editing) {
+        // Saved: App stops editing, which replaces this whole form.
+        await onSave(editing.id, transaction)
+        return
+      }
       // await pauses here until the backend answers. No id: the database picks it.
-      await onAdd({
-        amount: trimmed,
-        type,
-        category,
-        description: description.trim(),
-        transaction_date: date ?? today, // ?? : use today if date is null
-      })
+      await onAdd(transaction)
       // Saved: clear the form for the next entry.
       setAmount('')
       setType('')
@@ -67,7 +88,10 @@ function TransactionForm({ today, onAdd }) {
 
   return (
     <form className="panel transaction-form" onSubmit={handleSubmit}>
-      <h2>Add transaction</h2>
+      {/* tabIndex -1: code can focus the heading, but Tab still skips it. */}
+      <h2 ref={headingRef} tabIndex={-1}>
+        {editing ? 'Edit transaction' : 'Add transaction'}
+      </h2>
 
       <fieldset className="type-toggle">
         <legend>Type</legend>
@@ -159,8 +183,13 @@ function TransactionForm({ today, onAdd }) {
       )}
 
       <button type="submit" disabled={saving}>
-        {saving ? 'Saving…' : 'Add transaction'}
+        {saving ? 'Saving…' : editing ? 'Save changes' : 'Add transaction'}
       </button>
+      {editing && (
+        <button type="button" className="cancel-button" onClick={onCancel}>
+          Cancel
+        </button>
+      )}
     </form>
   )
 }

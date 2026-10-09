@@ -119,3 +119,49 @@ def test_deleting_a_missing_transaction_is_fine(client):
 
 def test_delete_rejects_a_non_number_id(client):
     assert client.delete("/transactions/abc").status_code == 422
+
+
+def test_update_changes_every_field_and_keeps_the_id(client):
+    saved = post_transaction(client).json()
+    changed = {
+        "amount": "99.50",
+        "type": "income",
+        "category": "other",
+        "description": "Refund",
+        "transaction_date": "2026-09-15",
+    }
+
+    response = client.put(f"/transactions/{saved['id']}", json=changed)
+
+    assert response.status_code == 200
+    assert response.json() == {"id": saved["id"], **changed}
+    assert client.get("/transactions").json() == [response.json()]
+
+
+def test_updated_amount_counts_in_the_summary(client):
+    expense = post_transaction(client, amount="40.00").json()
+
+    client.put(
+        f"/transactions/{expense['id']}", json={**VALID_TRANSACTION, "amount": "25.00"}
+    )
+
+    assert client.get("/summary").json()["total_expenses"] == "25.00"
+
+
+def test_updating_a_missing_transaction_is_a_404(client):
+    response = client.put("/transactions/999", json=VALID_TRANSACTION)
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "That transaction no longer exists."}
+
+
+def test_update_checks_the_input_like_create(client):
+    saved = post_transaction(client).json()
+
+    response = client.put(
+        f"/transactions/{saved['id']}", json={**VALID_TRANSACTION, "amount": 0}
+    )
+
+    assert response.status_code == 422
+    # Nothing changed.
+    assert client.get("/transactions").json()[0]["amount"] == "12.34"

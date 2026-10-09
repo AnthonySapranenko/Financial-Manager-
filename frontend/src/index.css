@@ -513,6 +513,22 @@ button[type='submit']:disabled {
   cursor: wait;
 }
 
+/* Cancel (while editing): the same size as the main button, but outlined,
+   so "Save changes" stays the obvious next step. */
+.cancel-button {
+  padding: calc(0.75rem - 1px);
+  font-weight: 600;
+  color: var(--green);
+  background: none;
+  border: 1px solid var(--green);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background: var(--field);
+}
+
 /* ---- Spending by category ---- */
 
 /* Narrow panel: donut above the legend. Wide panel: donut left. */
@@ -792,9 +808,10 @@ time {
   color: var(--ink-muted);
 }
 
-/* Quiet until you point at it: deleting is rare, logging is common. It sits
-   on the date's line, so rows don't get taller. */
-.delete-button {
+/* Edit and Delete: quiet until you point at them, because changing a row is
+   rare and logging is common. They sit on the date's line, so rows don't
+   get taller. */
+.row-button {
   margin-left: 0.75rem;
   padding: 0.125rem 0; /* about 24px tall: big enough to tap */
   font-size: 0.875rem;
@@ -806,11 +823,15 @@ time {
   cursor: pointer;
 }
 
-.delete-button:hover {
+.row-button:hover {
+  color: var(--green);
+}
+
+.row-button.delete:hover {
   color: var(--expense);
 }
 
-.delete-button:disabled {
+.row-button:disabled {
   cursor: wait;
   text-decoration: none;
 }

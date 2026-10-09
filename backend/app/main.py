@@ -93,6 +93,31 @@ def list_transactions(session: Session = Depends(get_session)):
     return [TransactionRead.from_transaction(t) for t in transactions]
 
 
+@app.put("/transactions/{transaction_id}", response_model=TransactionRead)
+def update_transaction(
+    transaction_id: int,
+    data: TransactionCreate,
+    session: Session = Depends(get_session),
+):
+    """Replace every field of a saved transaction; the id stays the same.
+    Unlike delete, a missing transaction is an error: the change can't be
+    saved anywhere (it was deleted in another tab, for example)."""
+    transaction = session.get(Transaction, transaction_id)
+    if transaction is None:
+        raise HTTPException(404, "That transaction no longer exists.")
+    # The same checks and dollars -> cents conversion as creating one.
+    changed = data.to_transaction()
+    transaction.amount_cents = changed.amount_cents
+    transaction.type = changed.type
+    transaction.category = changed.category
+    transaction.description = changed.description
+    transaction.transaction_date = changed.transaction_date
+    session.add(transaction)
+    session.commit()
+    session.refresh(transaction)
+    return TransactionRead.from_transaction(transaction)
+
+
 @app.delete("/transactions/{transaction_id}", status_code=204)
 def delete_transaction(transaction_id: int, session: Session = Depends(get_session)):
     """Delete a transaction. Deleting one that's already gone is fine, so a
