@@ -80,6 +80,11 @@ function fakeBackend(url, options) {
   if (url.startsWith('/api/transactions/') && options?.method === 'DELETE') {
     return new Response(null, { status: 204 })
   }
+  if (url.startsWith('/api/transactions/') && options?.method === 'PUT') {
+    // PUT answers with the saved transaction: what was sent, plus its id.
+    const id = Number(url.split('/').at(-1))
+    return respond({ id, ...JSON.parse(options.body) })
+  }
   return respond(SAVED)
 }
 
@@ -800,4 +805,87 @@ test('a failed delete leaves keyboard focus on its button', async () => {
 
   await screen.findByText("Can't reach the server. Is the backend running?")
   expect(button).toHaveFocus() // still next to its error, ready to retry
+})
+
+function editButton(name) {
+  return screen.getByRole('button', { name: `Edit ${name}` })
+}
+
+test('editing fills the form, saves with PUT, and updates the row', async () => {
+  render(<App />)
+  await listItems()
+
+  fireEvent.click(editButton('−$64.18 food expense on Sep 28, 2026'))
+
+  expect(screen.getByRole('heading', { name: 'Edit transaction' })).toHaveFocus()
+  expect(screen.getByLabelText('Amount ($)')).toHaveValue('64.18')
+  expect(screen.getByLabelText('Expense')).toBeChecked()
+  expect(screen.getByLabelText('Category')).toHaveValue('food')
+  expect(screen.getByLabelText('Date')).toHaveValue('2026-09-28')
+  expect(screen.getByLabelText('Description (optional)')).toHaveValue('Groceries')
+
+  fireEvent.change(screen.getByLabelText('Amount ($)'), { target: { value: '60' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+
+  // The form goes back to adding, empty, with focus on its heading.
+  const heading = await screen.findByRole('heading', { name: 'Add transaction' })
+  expect(heading).toHaveFocus()
+  expect(screen.getByLabelText('Amount ($)')).toHaveValue('')
+  const [url, options] = callWith('PUT')
+  expect(url).toBe('/api/transactions/2')
+  expect(JSON.parse(options.body)).toEqual({
+    amount: '60',
+    type: 'expense',
+    category: 'food',
+    description: 'Groceries',
+    transaction_date: '2026-09-28',
+  })
+  // The row shows the saved amount (the fake echoes "60"), and only once.
+  const rows = await listItems()
+  expect(rows).toHaveLength(2)
+  expect(rows[0]).toHaveTextContent('−$60.00')
+})
+
+test('cancel stops editing without saving', async () => {
+  render(<App />)
+  await listItems()
+  fireEvent.click(editButton('−$64.18 food expense on Sep 28, 2026'))
+
+  fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+  expect(screen.getByRole('heading', { name: 'Add transaction' })).toHaveFocus()
+  expect(screen.getByLabelText('Amount ($)')).toHaveValue('')
+  expect(callWith('PUT')).toBeUndefined()
+})
+
+test('a failed edit shows the reason and keeps the changes', async () => {
+  render(<App />)
+  await listItems()
+  fetch.mockImplementation(async (url, options) =>
+    options?.method === 'PUT'
+      ? respond({ detail: 'That transaction no longer exists.' }, 404)
+      : fakeBackend(url, options),
+  )
+  fireEvent.click(editButton('−$64.18 food expense on Sep 28, 2026'))
+  fireEvent.change(screen.getByLabelText('Amount ($)'), { target: { value: '60' } })
+
+  fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'That transaction no longer exists.',
+  )
+  expect(screen.getByRole('heading', { name: 'Edit transaction' })).toBeInTheDocument()
+  expect(screen.getByLabelText('Amount ($)')).toHaveValue('60')
+})
+
+test('deleting the transaction being edited empties the form', async () => {
+  vi.spyOn(window, 'confirm').mockReturnValue(true)
+  render(<App />)
+  await listItems()
+  fireEvent.click(editButton('−$64.18 food expense on Sep 28, 2026'))
+
+  fireEvent.click(deleteButton('−$64.18 food expense on Sep 28, 2026'))
+
+  expect(await screen.findByRole('heading', { name: 'Add transaction' })).toBeInTheDocument()
+  expect(screen.getByLabelText('Amount ($)')).toHaveValue('')
 })

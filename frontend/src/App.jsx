@@ -8,6 +8,7 @@ import {
   getSummary,
   getTransactions,
   setBudget,
+  updateTransaction,
 } from './api.js'
 import Budgets from './Budgets.jsx'
 import CategorySpending from './CategorySpending.jsx'
@@ -22,6 +23,23 @@ function App() {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+
+  // The transaction being changed in the form, or null when adding.
+  const [editing, setEditing] = useState(null)
+  // Stays false until the first edit, so loading the page doesn't move
+  // focus (on a phone that would jump the page). After that, the form
+  // focuses its heading every time it switches between adding and editing.
+  const [formFocus, setFormFocus] = useState(false)
+
+  function startEditing(transaction) {
+    setEditing(transaction)
+    setFormFocus(true)
+  }
+
+  function stopEditing() {
+    setEditing(null)
+    setFormFocus(true)
+  }
 
   // useToday re-renders App when the date changes, even with the page left
   // open overnight. "2026-10-08".slice(0, 7) is the month: "2026-10".
@@ -132,12 +150,25 @@ function App() {
     refreshMonth()
   }
 
+  // Save first, then swap in what the backend saved. If saving fails, the
+  // error goes back to the form, which keeps the user's changes.
+  async function saveTransaction(id, transaction) {
+    const saved = await updateTransaction(id, transaction)
+    // map makes a new array with that one transaction replaced.
+    setTransactions((current) => current.map((t) => (t.id === id ? saved : t)))
+    stopEditing()
+    refreshMonth()
+  }
+
   // Delete first, then drop it from the list. If deleting fails, the error
   // goes back to that transaction's row and the row stays.
   async function removeTransaction(id) {
     await deleteTransaction(id)
     // filter makes a new array without that one transaction.
     setTransactions((current) => current.filter((t) => t.id !== id))
+    // Deleted the one in the form? Then there's nothing left to edit.
+    // (An updater function: `editing` may have changed during the await.)
+    setEditing((current) => (current?.id === id ? null : current))
     refreshMonth()
   }
 
@@ -171,12 +202,23 @@ function App() {
           overallError={overallError}
         />
         <div className="layout">
-          <TransactionForm today={today} onAdd={addTransaction} />
+          {/* A new key builds a new form (see TransactionForm): "new" for
+              adding, the transaction's id for editing it. */}
+          <TransactionForm
+            key={editing ? editing.id : 'new'}
+            today={today}
+            onAdd={addTransaction}
+            editing={editing}
+            onSave={saveTransaction}
+            onCancel={stopEditing}
+            focusOnStart={formFocus}
+          />
           <TransactionList
             transactions={transactions}
             loading={loading}
             error={loadError}
             onDelete={removeTransaction}
+            onEdit={startEditing}
           />
           <div className="month">
             <CategorySpending

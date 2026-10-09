@@ -54,7 +54,8 @@ Built so far (one page, backed by the API):
 
 - Add a transaction: amount, income or expense, category, optional
   description (up to 200 characters), and date (today by default).
-- List transactions, newest first, and delete one after a confirm step.
+- List transactions, newest first; edit one in the form, or delete one
+  after a confirm step.
 - Totals for one month (income, expenses, balance), with previous/next
   month buttons and a "This month" shortcut, plus the all-time balance.
 - Spending by category for the month (donut chart and legend).
@@ -82,12 +83,15 @@ Constraints:
   and abstractions that are not needed.
 
 Decided (2026-10-06, Task 15): transactions can be deleted, after a confirm
-step, so a mistaken entry no longer leaves the totals wrong. To fix a typo,
-delete it and add it again.
+step, so a mistaken entry no longer leaves the totals wrong.
+
+Decided (2026-10-08, Task 23, made by Claude because the developer asked
+not to be asked): transactions can be edited in place. "Edit" loads one
+into the same form used for adding; every field can change. No confirm
+step: "Cancel" is right there, and nothing is lost.
 
 Undecided:
 
-- Editing a transaction in place.
 - Currency handling beyond US-style dollars.
 
 ## Brand Commitments

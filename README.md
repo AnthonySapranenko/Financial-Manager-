@@ -182,6 +182,7 @@ Other commands, also run from `frontend/`:
 | GET | `/health` | Check that the API is running |
 | POST | `/transactions` | Add an income or expense |
 | GET | `/transactions` | List all transactions, newest first |
+| PUT | `/transactions/{id}` | Change a transaction (same body as POST; 404 if it's gone) |
 | DELETE | `/transactions/{id}` | Delete a transaction (204, also if it's already gone) |
 | GET | `/summary` | Total income, total expenses, and balance (add `?month=YYYY-MM` for one month) |
 | GET | `/summary/categories?month=YYYY-MM` | One month's expenses per category (largest first) and their total |

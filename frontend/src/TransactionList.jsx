@@ -15,7 +15,7 @@ function formatDate(isoDate) {
 
 // One transaction: its own component, so each row can be "deleting…" or
 // show its own error without affecting the others (like BudgetRow).
-function TransactionRow({ transaction: t, onDelete }) {
+function TransactionRow({ transaction: t, onDelete, onEdit }) {
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
   const sign = t.type === 'income' ? '+' : '−'
@@ -56,7 +56,15 @@ function TransactionRow({ transaction: t, onDelete }) {
         <time dateTime={t.transaction_date}>{formatDate(t.transaction_date)}</time>
         <button
           type="button"
-          className="delete-button"
+          className="row-button"
+          onClick={() => onEdit(t)}
+          aria-label={`Edit ${summary}`}
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          className="row-button delete"
           onClick={handleDelete}
           disabled={deleting}
           aria-label={`Delete ${summary}`}
@@ -68,7 +76,7 @@ function TransactionRow({ transaction: t, onDelete }) {
   )
 }
 
-function TransactionList({ transactions, loading, error, onDelete }) {
+function TransactionList({ transactions, loading, error, onDelete, onEdit }) {
   // A ref is a box React fills with the real <h2> element once it's on the
   // page, so code can reach it: headingRef.current is the heading.
   const headingRef = useRef(null)
@@ -105,7 +113,12 @@ function TransactionList({ transactions, loading, error, onDelete }) {
     content = (
       <ul className="transaction-list">
         {sorted.map((t) => (
-          <TransactionRow key={t.id} transaction={t} onDelete={deleteAndKeepFocus} />
+          <TransactionRow
+            key={t.id}
+            transaction={t}
+            onDelete={deleteAndKeepFocus}
+            onEdit={onEdit}
+          />
         ))}
       </ul>
     )

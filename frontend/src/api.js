@@ -21,6 +21,16 @@ async function request(path, options) {
     throw new Error(messages.join(' '))
   }
 
+  // Our own "not found" has a plain-text reason too, e.g. editing a
+  // transaction that was deleted in another tab.
+  // (.catch: a 404 from somewhere else may not be JSON at all.)
+  if (response.status === 404) {
+    const body = await response.json().catch(() => ({}))
+    if (typeof body.detail === 'string') {
+      throw new Error(body.detail)
+    }
+  }
+
   if (!response.ok) {
     throw new Error(
       `The server had a problem (error ${response.status}). Is the backend running?`,
@@ -55,6 +65,15 @@ export function getBudgets(month) {
 export function createTransaction(transaction) {
   return request('/transactions', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(transaction),
+  })
+}
+
+// Sends every field, like createTransaction; the backend replaces them all.
+export function updateTransaction(id, transaction) {
+  return request(`/transactions/${id}`, {
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(transaction),
   })

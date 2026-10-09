@@ -3,15 +3,16 @@
 Handoff notes for the next Claude Code session. Read this first, then
 `README.md`, `BOSS.md`, `TASKS.md`, and `PRODUCT.md`.
 
-Last updated: 2026-10-08 (Task 22 in review)
+Last updated: 2026-10-08 (Task 23 in review)
 
 ## Where we are
 
-- Tasks 1–21 are merged (PRs #1–#21). Task 22 ("This month" shortcut) is
-  in review on `feature/this-month-shortcut`.
+- Tasks 1–22 are merged (PRs #1–#22). Task 23 (edit a transaction) is in
+  review on `feature/edit-transaction`.
 - When a PR is reported merged, verify before building on it: after
   `git fetch`, run `git merge-base --is-ancestor <branch> origin/master`.
 - Backend endpoints: `/health`; `POST`/`GET /transactions`;
+  `PUT /transactions/{id}` (same body as POST; plain-text 404 when gone);
   `DELETE /transactions/{id}` (204, also when already gone);
   `GET /summary` (optional `?month=YYYY-MM`, otherwise all time);
   `GET /summary/categories?month=`; `GET /budgets?month=` (every expense
@@ -21,31 +22,42 @@ Last updated: 2026-10-08 (Task 22 in review)
   `spending_by_category()`. Tables: `transactions`, `budgets` (category is the
   primary key).
 - Frontend (`frontend/src/`): `api.js` (all fetches; handles 204 and
-  plain-text 422), `dates.js` (`useToday()` hook, `shiftMonth`,
+  plain-text 422/404), `dates.js` (`useToday()` hook, `shiftMonth`,
   `monthName`), `money.js` (`formatMoney`, `isValidAmount`, `AMOUNT_ERROR`),
   `App.jsx` (state; `month` = `chosenMonth ?? thisMonth`; one effect loads the
   month's numbers, keyed on `[month, reloads]`, with an `ignore` flag;
   `refreshMonth()` just bumps `reloads`), `Summary.jsx` (totals plate with
   previous/next month buttons, a "This month" shortcut, and an all-time
   balance footnote row), `CategorySpending.jsx` (SVG donut + legend),
-  `Budgets.jsx`, `TransactionForm.jsx` (date state `null` = "today"),
-  `TransactionList.jsx` (focus moves to the heading after a delete).
-- Tests (after Task 22): 59 backend (pytest) and 46 frontend (Vitest), all
+  `Budgets.jsx`, `TransactionForm.jsx` (date state `null` = "today";
+  `editing` prop switches it to edit mode; App remounts it with `key`),
+  `TransactionList.jsx` (Edit/Delete row links, class `row-button`;
+  focus moves to the heading after a delete).
+- Tests (after Task 23): 63 backend (pytest) and 50 frontend (Vitest), all
   passing.
 - Running the app needs both servers (see `README.md`). A manual run creates
   `backend/finance.db`; delete it to start empty.
 
-## Start here: Task 22 is in review
+## Start here: Task 23 is in review
 
-Once it's merged (verify with `git merge-base --is-ancestor`), pick Task 23
+Once it's merged (verify with `git merge-base --is-ancestor`), pick Task 24
 from master. Candidates:
-- Editing a transaction in place (still undecided in `PRODUCT.md`).
+- Show which row is being edited (a subtle highlight in the list). Today
+  only the filled-in form says which one it is.
 - Category/type mismatch is allowed: an expense can be "salary" and income
   can be "food" (the developer's own sample data has both). Budgets already
   reject salary. Product call: restrict salary to income?
 - Making the donut tooltips keyboard-friendly (see follow-ups below). Small.
 
 Recent tasks, for context:
+- Task 23: edit in place. Product call made by Claude (developer said not
+  to ask), recorded in `PRODUCT.md`. App keeps `editing` (a transaction or
+  null) and renders `<TransactionForm key={editing ? editing.id : 'new'}>`:
+  a new key throws the old form away, so `useState(editing?.amount ?? '')`
+  starting values apply fresh. `formFocus` (false until the first edit)
+  makes the new form focus its heading, so page load never moves focus.
+  Deleting the transaction being edited clears `editing`. Save failures
+  (e.g. 404) stay in the form with the user's changes.
 - Task 22: `Summary.jsx` shows a "This month" button only when
   `month !== thisMonth`; it calls `onMonthChange(thisMonth)`, which stores
   `null`, so the page follows the date again. `goTo()` moves focus to
@@ -95,6 +107,8 @@ Small follow-ups found in reviews (not done yet):
   until the answers arrive (milliseconds on localhost). Clearing them would
   make the panels flash "Loading…" and jump on every click.
 - Donut tooltips are mouse-only (the legend carries all values).
+- Clicking "Edit" (or "Cancel") swaps the form, so a half-typed new
+  transaction is thrown away without a warning.
 - A budget row's input keeps its typed value if the budget changes elsewhere
   (e.g. another tab) until reload.
 
@@ -185,6 +199,10 @@ errors are 422 responses with FastAPI's `detail` list.
   `--remote-debugging-port`). Foreground `sleep` is blocked, and one long
   combined command got rejected. Node 24 has `fetch` and `WebSocket`
   built in, so a ~30-line CDP script can click and screenshot.
+- `.claude/settings.json` allows the common read-only checks without a
+  prompt (`npm run lint`, `npx vitest --run`, `npm test -- --run`, pytest,
+  `git fetch`, `git merge-base`). Run them in Bash, not behind a
+  PowerShell `$env:Path = ...;` prefix, or the rules don't match.
 - Mutation check used this session: break the fix on purpose, confirm the
   new test fails, then restore. Cheap proof that a test catches the bug.
 
@@ -198,5 +216,3 @@ errors are 422 responses with FastAPI's `detail` list.
   the developer has not made yet. (Future-dated transactions also count in
   the all-time balance.)
 - No paging on `GET /transactions`.
-- Editing a transaction in place: undecided (see `PRODUCT.md`). Deleting
-  was decided and built in Task 15.

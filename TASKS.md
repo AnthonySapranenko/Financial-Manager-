@@ -29,13 +29,15 @@ Later tasks are a proposed order and may change.
 
 21. **All-time balance**: a footnote row on the totals plate with the balance across all months, from `GET /summary` with no month (PR #21)
 
+22. **"This month" shortcut**: a quiet "This month" link next to the month buttons, shown only on an earlier month; keyboard focus moves to "Previous month" when the clicked button disappears or turns disabled (PR #22)
+
 ## In review
 
-22. **"This month" shortcut**: a quiet "This month" link next to the month buttons, shown only on an earlier month; keyboard focus moves to "Previous month" when the clicked button disappears or turns disabled (branch `feature/this-month-shortcut`)
+23. **Edit a transaction**: `PUT /transactions/{id}` (404 when it's gone); an "Edit" link on each row loads the transaction into the form, which becomes "Edit transaction" with "Save changes" and "Cancel" (branch `feature/edit-transaction`)
 
 ## Planned
 
-Nothing yet. Editing a transaction in place is still undecided in `PRODUCT.md`.
+Nothing yet.
 
 ## Agreed decisions
 
